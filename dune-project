@@ -1,27 +1,26 @@
 (lang dune 3.17)
-
 (name compsig)
-
 (generate_opam_files true)
 
-(source
- (github username/reponame)
- )
+(source (github nmmull/compsig))
 
-(authors "Author Name <author@example.com>")
+(authors
+ "Nathan Mull <nmmull@bu.edu>"
+ "William Chen")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers
+ "Nathan Mull <nmmull@bu.edu>"
+ "William Chen")
 
-(license LICENSE)
-
-(documentation https://url/to/documentation)
+(license TODO)
+(documentation TODO)
 
 (package
  (name compsig)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml)
+ (synopsis "TODO")
+ (description "TODO")
+ (depends ocaml alcotest)
  (tags
-  ("add topics" "to describe" your project)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+  ("algebraic signal processing"
+   supercollider
+   "computer music")))
