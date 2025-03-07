@@ -2,13 +2,13 @@ open Compsig.Polynomial
 open Alcotest
 
 let test_num_terms_empty () =
-  Alcotest.(check int)
+  check int
     "empty has no terms"
     0
     (num_terms empty)
 
 let test_num_terms_monomial () =
-  Alcotest.(check int)
+  check int
     "monomial has one terms"
     1
     (num_terms (monomial 23.4 40))
