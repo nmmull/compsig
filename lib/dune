@@ -1,2 +1,3 @@
 (library
- (name compsig))
+ (name compsig)
+ (libraries fmt))
