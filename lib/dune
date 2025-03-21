@@ -1,3 +1,6 @@
 (library
  (name compsig)
  (libraries fmt))
+
+(menhir (modules lambda_sc_parser))
+(ocamllex lambda_sc_lexer)

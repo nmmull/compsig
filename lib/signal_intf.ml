@@ -5,6 +5,12 @@ module type Intf = sig
   include Utils.PP with type t := t
   include Utils.RING with type t := t
 
+  val ident : t
+  val sin : t -> t
+  val const : float -> t
+
   val comp_base : t base_signal -> t -> t
   val comp : t -> t -> t
+
+  val of_expr : Syntax.expr -> t
 end

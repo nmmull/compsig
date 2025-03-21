@@ -24,3 +24,5 @@
   ("algebraic signal processing"
    supercollider
    "computer music")))
+
+(using menhir 3.0)

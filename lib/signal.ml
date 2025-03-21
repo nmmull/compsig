@@ -2,7 +2,10 @@ type 'a base_signal =
   | Ident
   | Sin of 'a
 
-module rec P : Polynomial_intf.POLYNOMIAL with type base = Base.t = Polynomial.Make(Utils.FloatCoefficient)(Base)
+module rec P : Polynomial_intf.POLYNOMIAL
+           with type base = Base.t
+           with type coefficient = float
+  = Polynomial.Make(Utils.FloatCoefficient)(Base)
    and Base : Utils.BASE with type t = P.t base_signal = struct
      type t = P.t base_signal
 
@@ -18,9 +21,24 @@ module rec P : Polynomial_intf.POLYNOMIAL with type base = Base.t = Polynomial.M
 
 include P
 
+let ident = P.of_base Ident
+let sin signal = P.of_base (Sin signal)
+let const = P.of_coefficient
+
 let rec comp_base base signal =
   match base with
   | Ident -> signal
   | Sin p1 -> P.of_base (Sin (P.comp comp_base p1 signal))
 
 let comp sig1 sig2 = P.comp comp_base sig1 sig2
+
+let of_expr =
+  let open Syntax in
+  let rec go = function
+    | Ident -> ident
+    | Sin -> sin ident
+    | Const f -> const f
+    | Add (e1, e2) -> add (go e1) (go e2)
+    | Mul (e1, e2) -> mul (go e1) (go e2)
+    | Comp (e1, e2) -> comp (go e1) (go e2)
+  in go

@@ -25,7 +25,6 @@ module type ADD_MONOID = sig
   val zero : t
   val add : t -> t -> t
 end
-
 module type RING = sig
   type t
   include ADD_MONOID with type t := t
