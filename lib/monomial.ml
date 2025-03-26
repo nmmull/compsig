@@ -5,7 +5,7 @@ module Make (B : Utils.BASE) = struct
   type t = int M.t
   type base = B.t
 
-  let of_list = M.of_list
+  let of_list l = M.of_list (List.filter (fun (_, n) -> n > 0) l)
   let to_list = M.to_list
   let fold = M.fold
 

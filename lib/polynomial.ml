@@ -9,7 +9,13 @@ module Make (C : COEFFICIENT) (B : Utils.BASE) = struct
   type monomial = M.t
   type t = C.t P.t (* map exponents to coefficients *)
 
-  let of_list l = P.of_list (List.map (fun (x, y) -> (y, x)) l)
+  let of_list l =
+    let module CC = Utils.Compare(C) in
+    l
+    |> List.filter (fun (c, _) -> not (CC.equals c C.zero))
+    |> List.map (fun (x, y) -> (y, x))
+    |> P.of_list
+
   let to_list p =
     p
     |> P.to_list

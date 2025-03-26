@@ -1,55 +1,66 @@
 open Alcotest
 
-module P = Compsig.Polynomial.Make(Compsig.Polynomial.IntCoefficient)
+module Variable = Test_monomial.Variable
 
-let poly = testable P.pp P.equal
+module P = Compsig.Polynomial.Make(Compsig.Utils.IntCoefficient)(Variable)
+module M = Compsig.Monomial.Make(Variable)
 
-let test_add_basic () =
-  let p1 = P.of_list [(12, 0); (4, 1); (3, 2)] in
-  let p2 = P.of_list [(1, 0); (3, 2); (2, 3)] in
-  let expected = P.of_list [(13, 0); (4, 1); (6, 2); (2, 3)] in
+let poly =
+  let module T = Compsig.Utils.Testable(P) in
+  T.testable
+
+let test_zero () =
+  let expected = P.zero in
+  let actual =P.of_list [] in
   check poly
-    "(3x² + 4x + 12) + (2x³ + 3x² + 1) = 2x³ + 6x² + 4x + 13"
+    "of_list [] = 0"
     expected
-    P.(p1 + p2)
+    actual
 
-let test_mul_basic () =
-  let p = P.of_list [(1, 1); (5, 0)] in
-  let expected = P.of_list [(1, 2); (10, 1); (25, 0)] in
+let test_one () =
+  let expected = P.one in
+  let actual = P.of_list [(1, M.one)] in
   check poly
-    "(x + 5)² = x² + 10x + 25"
+    "1 = 1 * 1"
     expected
-    P.(p * p)
+    actual
 
-let test_pow_basic () =
-  let p = P.of_list [(1, 1); (2, 0)] in
-  let expected = P.of_list [(1, 3); (6, 2); (12, 1); (8, 0)] in
+let test_add () =
+  let m1 = M.of_list [(X, 2)] in
+  let m2 = M.of_list [(Y, 3)] in
+  let p1 = P.of_list [(2, m1)] in
+  let p2 = P.of_list [(5, m2)] in
+  let expected = P.of_list [(2, m1); (5, m2)] in
+  let actual = P.add p1 p2 in
   check poly
-    "(x + 2)³ = x³ + 6x² + 12x + 8"
+    "add 2X² 5Y³ = 2X² + 5Y³"
     expected
-    P.(p ^ 3)
+    actual
 
-let test_comp_basic () =
-  let p = P.of_list [(1, 2); (2, 0)] in
-  let expected = P.((p ^ 2) + const 2) in
+let test_mul () =
+  let x = M.of_list [X, 1] in
+  let p = P.of_list [(1, x); (1, M.one)] in
+  let expected = P.of_list [(1, M.mul x x); (2, x); (1, M.one)] in
+  let actual = P.mul p p in
   check poly
-    "(x² + 2) << (x² + 2) = (x² + 2)² + 2"
+    "(X + 1)² = X² + 2X + 1"
     expected
-    P.(p << p)
+    actual
 
-let test_factor_basic () =
-  let p = P.of_list [(2, 3); (-3, 2); (14, 0)] in
-  let expected = (P.of_list [(2, 2); (-3, 1)], 14) in
-  check (pair poly int)
-    "2x³ - 3x² + 14 = (2x² - 3x)x + 14"
+let test_zero_coefficient () =
+  let x = M.of_list [X, 1] in
+  let expected = P.of_list [(5, x)] in
+  let actual = P.of_list [(0, x); (5, x)] in
+  check poly
+    "0X + 5X = 5X"
     expected
-    (P.factor_t p)
+    actual
 
 let tests =
   [
-    test_case "basic add test" `Quick test_add_basic;
-    test_case "basic mul test" `Quick test_mul_basic;
-    test_case "basic pow test" `Quick test_pow_basic;
-    test_case "basic comp test" `Quick test_comp_basic;
-    test_case "basic factor test" `Quick test_factor_basic;
+    test_case "basic zero test" `Quick test_zero;
+    test_case "basic one test" `Quick test_one;
+    test_case "basic add test" `Quick test_add;
+    test_case "basic mul test" `Quick test_mul;
+    test_case "basic zero coefficient test" `Quick test_zero_coefficient;
   ]

@@ -31,8 +31,7 @@ module type RING = sig
   include MUL_MONOID with type t := t
 end
 
-module Mul_monoid (M: MUL_MONOID) = struct
-  include M
+module Mul_monoid (M : MUL_MONOID) = struct
   let pow poly exp =
     if exp < 0
     then raise (Invalid_argument "cannot take negative ring power")
@@ -44,9 +43,28 @@ module Mul_monoid (M: MUL_MONOID) = struct
       in go M.one exp
 end
 
+module Compare (C : COMPARE) = struct
+  let equals x y = C.compare x y = 0
+end
+
+module Testable(B : BASE) = struct
+  let testable =
+    let module C = Compare(B) in
+    Alcotest.testable B.pp C.equals
+end
+
 module FloatCoefficient = struct
   include Float
   let pp = Fmt.float
+  let compare f1 f2 =
+    if f1 -. f2 > epsilon
+    then 1
+    else if f2 -. f1 > epsilon
+    then -1
+    else 0
 end
 
-let is_close f1 f2 = Float.(abs (f1 -. f2) < epsilon)
+module IntCoefficient = struct
+  include Int
+  let pp = Fmt.nop
+end
