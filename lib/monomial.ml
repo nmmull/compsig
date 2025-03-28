@@ -21,5 +21,5 @@ module Make (B : Utils.BASE) = struct
     M.merge combiner mon1 mon2
 
   let compare = M.compare Int.compare
-  let pp = Fmt.nop (* TODO *)
+  let pp = Fmt.nop
 end

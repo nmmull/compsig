@@ -78,4 +78,5 @@ module Make (C : COEFFICIENT) (B : Utils.BASE) = struct
       (fun coeff mono acc -> add (mul (of_coefficient coeff) (comp_mono f mono poly2)) acc)
       poly1
       zero
+
 end

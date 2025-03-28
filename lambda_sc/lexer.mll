@@ -1,5 +1,5 @@
 {
-open Lambda_sc_parser
+open Parser
 }
 
 let whitespace = [' ' '\t' '\n' '\r']+

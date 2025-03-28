@@ -1,0 +1,5 @@
+(library
+ (name lambda_sc)
+  (libraries compsig))
+(menhir (modules parser))
+(ocamllex lexer)

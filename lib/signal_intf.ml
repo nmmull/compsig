@@ -1,5 +1,9 @@
+open Syntax
+
 module type Intf = sig
-  type 'a base_signal
+  type 'a base_signal =
+    | Ident
+    | Sin of 'a
   type t
   include Utils.COMPARE with type t := t
   include Utils.PP with type t := t
@@ -8,6 +12,8 @@ module type Intf = sig
   val ident : t
   val sin : t -> t
   val const : float -> t
+
+  val to_expr : t -> expr
 
   val comp_base : t base_signal -> t -> t
   val comp : t -> t -> t

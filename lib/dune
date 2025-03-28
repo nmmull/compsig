@@ -1,6 +1,3 @@
 (library
  (name compsig)
  (libraries fmt alcotest))
-
-(menhir (modules lambda_sc_parser))
-(ocamllex lambda_sc_lexer)

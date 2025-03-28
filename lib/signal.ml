@@ -3,8 +3,9 @@ type 'a base_signal =
   | Sin of 'a
 
 module rec P : Polynomial_intf.POLYNOMIAL
-           with type base = Base.t
            with type coefficient = float
+           with type base = Base.t
+           with type monomial = Monomial.Make(Base).t
   = Polynomial.Make(Utils.FloatCoefficient)(Base)
    and Base : Utils.BASE with type t = P.t base_signal = struct
      type t = P.t base_signal
@@ -20,6 +21,7 @@ module rec P : Polynomial_intf.POLYNOMIAL
    end
 
 include P
+module M = Monomial.Make(Base)
 
 let ident = P.of_base Ident
 let sin signal = P.of_base (Sin signal)
@@ -30,4 +32,23 @@ let rec comp_base base signal =
   | Ident -> signal
   | Sin p1 -> P.of_base (Sin (P.comp comp_base p1 signal))
 
-let comp sig1 sig2 = P.comp comp_base sig1 sig2
+let comp = P.comp comp_base
+
+let rec to_expr (s : t) =
+  s
+  |> P.to_list
+  |> List.map (fun (c, m) ->
+         let m = monomial_to_expr m in
+         if c = 1.
+         then m
+         else Syntax.Prod [Syntax.Const c; m])
+  |> List.filter ((<>) (Syntax.Const 0.))
+  |> fun l -> Syntax.Sum l
+and monomial_to_expr mono =
+  mono
+  |> M.to_list
+  |> List.map (fun (b, e) -> Syntax.Pow (base_signal_to_expr b, e))
+  |> fun l -> Syntax.Prod l
+and base_signal_to_expr = function
+  | Ident -> Syntax.Ident
+  | Sin s -> Syntax.Sin (to_expr s)
