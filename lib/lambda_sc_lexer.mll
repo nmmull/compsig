@@ -18,9 +18,9 @@ rule read =
   | "+" { PLUS }
   | "*" { TIMES }
   | "<<" { COMP }
-  | "Sin" { SIN }
-  | "Pow" { POW }
-  | "T" { T }
+  | "sin" { SIN }
+  | "pow" { POW }
+  | "t" { T }
   | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | var { VAR (Lexing.lexeme lexbuf) }

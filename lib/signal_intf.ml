@@ -11,6 +11,4 @@ module type Intf = sig
 
   val comp_base : t base_signal -> t -> t
   val comp : t -> t -> t
-
-  val of_expr : Syntax.expr -> t
 end

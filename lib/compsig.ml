@@ -1,5 +1,3 @@
-include Syntax
-
 module Utils = Utils
 module Monomial = Monomial
 module Polynomial = Polynomial
