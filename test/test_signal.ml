@@ -24,42 +24,74 @@ let test_comp () =
     s1
     s2
 
-let test_expr () =
-  let e1 =
-    Comp
-      ( Add
-          ( Mul (Const 2., Mul (Ident, Ident))
-          , Comp (Sin, Mul (Const 2., Ident))
-          )
-      , Add (Ident, (Const 1.))
-      )
+let test_complex_poly () =
+  let open Signal in
+  let s1 =
+    comp
+      (mul (const 2.) (mul ident ident))
+      (add ident (const 1.))
   in
-  let e2 =
-    Add
-      ( Mul (Const 2., Mul (Ident, Ident))
-      , Add
-         ( Mul (Const 4., Ident)
-         , Add
-            ( Const 2.
-            , Comp
-                ( Sin
-                , Add
-                    ( Mul (Const 3., Ident)
-                    , Const 3.
-                    )
-                )
-            )
-         )
-      )
+  let s2 =
+    add
+      (mul (const 2.) (mul ident ident))
+      (add
+        (mul (const 4.) ident)
+        (const 2.))
+  in
+  check signal
+    "2T² ∘ (T + 1) = 2T² + 4T + 2"
+    s1
+    s2
+
+let test_complex_sin () =
+  let open Signal in
+  let s1 =
+    comp
+      (sin (mul (const 3.) ident))
+      (add ident (const 1.))
+  in
+  let s2 =
+    (sin
+       (add
+          (mul (const 3.) ident)
+          (const 3.)))
+  in
+  check signal
+    "sin(3T) ∘ (T + 1) = sin(3T + 3)"
+    s1
+    s2
+
+let test_complex () =
+  let open Signal in
+  let s1 =
+    comp
+      (add
+        (mul (const 2.) (mul ident ident))
+        (sin (mul (const 3.) ident)))
+      (add ident (const 1.))
+  in
+  let s2 =
+    add
+      (mul (const 2.) (mul ident ident))
+      (add
+        (mul (const 4.) ident)
+        (add
+           (const 2.)
+           (sin
+              (add
+                 (mul (const 3.) ident)
+                 (const 3.)))))
   in
   check signal
     "(2T² + sin(3T)) ∘ (T + 1) = 2T² + 4T + 2 + sin(3T + 3)"
-    (S.of_expr e1)
-    (S.of_expr e2)
+    s1
+    s2
 
 let tests =
   [
     test_case "basic add mul test" `Quick test_double;
     test_case "basic comp test" `Quick test_comp;
-    test_case "not so basic expr test" `Quick test_expr;
+    test_case "not so basic poly comp test" `Quick test_complex_poly;
+    test_case "not so basic sin comp test" `Quick test_complex_sin;
+    test_case "not so basic signal test" `Quick test_complex;
   ]
