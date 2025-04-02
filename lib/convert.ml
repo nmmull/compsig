@@ -5,7 +5,7 @@ module Matplotlib = struct
     let rec go = function
       | Ident -> "x"
       | Const f -> string_of_float f
-      | Sin e -> "np.sin(" ^ go e^ ")"
+      | Sin e -> "np.sin(" ^ go e ^ ")"
       | Sum es -> (
          match es with
          | [] -> ""
@@ -31,7 +31,7 @@ module Matplotlib = struct
          else e ^ " ** " ^ string_of_int n
     in go
 
-  let to_matplotlib (s : Signal.t) : string =
+  let of_signal (s : Signal.t) : string =
     let prog =
       String.concat "\n"
         [
@@ -44,31 +44,10 @@ module Matplotlib = struct
           "plt.show()";
         ]
     in prog
-
 end
-(* let string_of_base_signal (printer: 'a -> string) (b : 'a Signal.base_signal) = *)
-(*   let open Signal in *)
-(*   match b with *)
-(*   | Ident -> "x" *)
-(*   | Sin a -> "np.sin(" ^ printer a ^ ")" *)
 
-(* let string_of_signal (s : Signal.t) : string = *)
-
-(*   (\* let rec go s = *\) *)
-(*   (\*   match s with *\) *)
-(*   (\*   | 2 *\) *)
-(*   (\* in go s *\) *)
-
-(* let to_matplotlib (s : Signal.t) : string = *)
-(*   let prog = *)
-(*     String.concat "\n" *)
-(*       [ *)
-(*         "import matplotlib.pyplot as plt"; *)
-(*         "import numpy as np"; *)
-(*         "x = np.linspace(0, 10, 100)"; *)
-(*         "y = " ^ string_of_signal s; *)
-(*         "fig, ax = plt.subplots()"; *)
-(*         "ax.plot(x, y)"; *)
-(*         "plt.show()"; *)
-(*       ] *)
-(*   in prog *)
+module Supercollider = struct
+  let string_of_expr =
+    let go _ = assert false
+  in go
+end

@@ -22,7 +22,7 @@ let rec eval env =
     | Pow (e1, exp) ->
        let module M = Compsig.Utils.Mul_monoid(Compsig.Signal) in
        M.pow (go e1) exp
-    | Var x -> Env.find x env (* TODO *)
+    | Var x -> Env.find x env (* TODO: Better error handling *)
     | Let(x, e1, e2) -> eval (Env.add x (go e1) env) e2
   in go
 let eval = eval Env.empty

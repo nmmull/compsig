@@ -16,7 +16,7 @@ open Lambda_sc_intf
 %token LPAREN "("
 %token RPAREN ")"
 %token COMMA ","
-%token T "T"
+%token T "t"
 %token EOF
 
 %left PLUS
@@ -28,11 +28,11 @@ open Lambda_sc_intf
 %%
 
 prog:
-  | e = expr EOF { e }
+  | e=expr EOF { e }
 
 expr:
-  | "let" x = VAR "=" e1 = expr "in" e2 = expr { Let (x, e1, e2) }
-  | e = expr1 { e }
+  | "let" x=VAR "=" e1=expr "in" e2=expr { Let (x, e1, e2) }
+  | e=expr1 { e }
 
 %inline bop:
   | "+" { Add }
@@ -40,13 +40,13 @@ expr:
   | "<<" { Comp }
 
 expr1:
-  | e1 = expr1 op = bop e2 = expr1 { Bop(op, e1, e2) }
-  | "sin" "(" e1 = expr2 "," e2 = expr2 ")" { Sin {freq=e1;phase=e2} }
-  | e = expr2 { e }
+  | e1=expr1 op=bop e2=expr1 { Bop(op, e1, e2) }
+  | "sin" "(" e1=expr2 "," e2=expr2 ")" { Sin {freq=e1;phase=e2} }
+  | e=expr2 { e }
 
 expr2:
-  | n = FLOAT { Float n }
-  | "T" { Ident }
-  | x = VAR { Var x }
-  | "pow" "(" e = expr1 "," n = INT ")" { Pow(e, n) }
-  | "(" e = expr ")" { e }
+  | n=FLOAT { Float n }
+  | "t" { Ident }
+  | x=VAR { Var x }
+  | "pow" "(" e=expr1 "," n=INT ")" { Pow(e, n) }
+  | "(" e=expr ")" { e }
