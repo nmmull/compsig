@@ -1,4 +1,4 @@
 (executable
  (public_name compsig)
  (name main)
- (libraries compsig lambda_sc))
+ (libraries compsig lambda_sc cmdliner))

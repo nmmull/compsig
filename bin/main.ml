@@ -1,31 +1,22 @@
-let () = print_endline "Hello, World!"
+open Compsig.Utils
+open Cmdliner
 
-let int_to_exponent (x : int) : string =
-  let rec go output_string = function
-    | 0 -> output_string
-    | num -> 
-      let take_value value =
-        let ones = value mod 10 in
-        let other = value - ones in
-        let find_exp n = 
-          match n with
-          | 0 -> "⁰"
-          | 1 -> "¹"
-          | 2 -> "²"
-          | 3 -> "³"
-          | 4 -> "⁴"
-          | 5 -> "⁵"
-          | 6 -> "⁶"
-          | 7 -> "⁷"
-          | 8 -> "⁸"
-          | 9 -> "⁹"
-          | _ -> assert false
-        in
-        find_exp ones, other
-      in
-      match take_value num with
-      | (expon, other) -> go (expon ^ output_string) (other / 10)
-  in
-  go "" x
+let superscript num = print_endline (int_to_exponent num)
 
-let () = print_endline (int_to_exponent 125684)
+let number =
+    let doc = "The number to superscript." in
+    Arg.(value (opt int 0 (info ["s"; "superscript"] ~doc ~docv:"SUPERSCRIPT")))
+
+let superscript_t = Term.(const superscript $ number)
+
+let superscript_cmd =
+    let doc = "Print the superscript of a number" in
+    let man = [
+        `S Manpage.s_bugs;
+        `P "I'on't know what you're talking about."]
+    in
+    let info = Cmd.info "superscript" ~version:"0.1" ~doc ~man in
+    Cmd.v info superscript_t
+
+let main () = exit (Cmd.eval superscript_cmd)
+let () = main ()

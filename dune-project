@@ -19,7 +19,7 @@
  (name compsig)
  (synopsis "TODO")
  (description "TODO")
- (depends ocaml alcotest fmt)
+ (depends ocaml alcotest fmt cmdliner)
  (tags
   ("algebraic signal processing"
    supercollider

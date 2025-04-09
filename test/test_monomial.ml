@@ -9,8 +9,14 @@ module Variable = struct
     else if v1 = v2
     then 0
     else 1
+  
+  let to_string ty =
+    match ty with
+    | X -> "x"
+    | Y -> "y"
+    | Z -> "z"
 
-  let pp = Fmt.nop
+  let pp = Fmt.of_to_string to_string
 end
 
 module M = Compsig.Monomial.Make(Variable)
