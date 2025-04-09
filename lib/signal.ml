@@ -17,7 +17,11 @@ module rec P : Polynomial_intf.POLYNOMIAL
        | _, Ident -> 1
        | Sin p1, Sin p2 -> P.compare p1 p2
 
-     let pp = Fmt.nop
+     let to_string = function
+     | Ident -> "t"
+     | Sin signal -> "sin(" ^ Fmt.to_to_string P.pp signal ^ ")"
+
+     let pp = Fmt.of_to_string to_string
    end
 
 include P

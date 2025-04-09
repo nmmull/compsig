@@ -66,7 +66,7 @@ end
 
 module IntCoefficient = struct
   include Int
-  let pp = Fmt.nop
+  let pp = Fmt.int
 end
 
 let int_to_exponent (input : int) : string =
