@@ -1,6 +1,7 @@
-include Lambda_sc_intf
+include Lambda_sc_parser.Syntax
 
 let parse s =
+  let open Lambda_sc_parser in
   match Parser.prog Lexer.read (Lexing.from_string s) with
   | expr -> Some expr
   | exception _ -> None
@@ -8,7 +9,7 @@ let parse s =
 module Env = Map.Make(String)
 
 let rec eval env =
-  let open Compsig.Signal in
+  let open Signal in
   let rec go = function
     | Float f -> const f
     | Ident -> ident
@@ -20,7 +21,7 @@ let rec eval env =
     | Bop (Mul, e1, e2) -> mul (go e1) (go e2)
     | Bop (Comp, e1, e2) -> comp (go e1) (go e2)
     | Pow (e1, exp) ->
-       let module M = Compsig.Utils.Mul_monoid(Compsig.Signal) in
+       let module M = Utils.Mul_monoid(Signal) in
        M.pow (go e1) exp
     | Var x -> Env.find x env (* TODO: Better error handling *)
     | Let(x, e1, e2) -> eval (Env.add x (go e1) env) e2

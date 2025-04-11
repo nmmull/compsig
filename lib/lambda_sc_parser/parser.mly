@@ -1,5 +1,5 @@
 %{
-open Lambda_sc_intf
+open Syntax
 %}
 
 %token <float> FLOAT
@@ -23,7 +23,7 @@ open Lambda_sc_intf
 %left TIMES
 %left COMP
 
-%start <Lambda_sc_intf.expr> prog
+%start <Syntax.expr> prog
 
 %%
 
@@ -41,7 +41,7 @@ expr:
 
 expr1:
   | e1=expr1 op=bop e2=expr1 { Bop(op, e1, e2) }
-  | "sin" "(" e1=expr2 "," e2=expr2 ")" { Sin {freq=e1;phase=e2} }
+  | "sin" "(" e1=expr2 "," e2=expr2 ")" { Sin {freq= Bop(Mul, e1, Ident) ;phase=e2} }
   | e=expr2 { e }
 
 expr2:
