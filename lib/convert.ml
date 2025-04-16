@@ -8,7 +8,7 @@ module Matplotlib = struct
       | Sin e -> "np.sin(" ^ go e ^ ")"
       | Sum es -> (
          match es with
-         | [] -> ""
+         | [] -> "0.0"
          | e :: es ->
             List.fold_left
               (fun acc e -> acc ^ " + " ^ go e)
@@ -17,7 +17,7 @@ module Matplotlib = struct
       )
       | Prod es -> (
          match es with
-         | [] -> ""
+         | [] -> "1.0"
          | e :: es ->
             List.fold_left
               (fun acc e -> acc ^ " * " ^ go e)
@@ -49,7 +49,7 @@ end
 module Supercollider = struct
   let of_expr =
     let rec go = function
-      | Ident -> assert false
+      | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)"
       | Const f -> string_of_float f ^ "0"
       | Sin e ->
          let signal = Signal.of_expr e in
