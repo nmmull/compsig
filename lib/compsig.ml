@@ -7,7 +7,7 @@ module Lambda_sc = Lambda_sc
 
 type format =
   | LambdaSC
-  | Supercollider
+  | SuperCollider
   | Matplotlib
 
 let convert in_format out_format str =
@@ -28,5 +28,5 @@ let convert in_format out_format str =
     in
     match out_format with
     | Matplotlib -> Convert.Matplotlib.of_signal signal
-    | Supercollider -> Convert.Supercollider.of_signal signal
+    | SuperCollider -> Convert.SuperCollider.of_signal signal
     | _ -> failwith "Not implemented"

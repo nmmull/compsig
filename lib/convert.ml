@@ -46,7 +46,7 @@ module Matplotlib = struct
     in prog
 end
 
-module Supercollider = struct
+module SuperCollider = struct
   let of_expr =
     let rec go = function
       | Ident -> assert false
