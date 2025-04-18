@@ -8,6 +8,8 @@ let var = ['a'-'z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '\'']*
 
 rule read =
   parse
+  | "signal" { SIGNAL }
+  | ":" { COLON }
   | "fun" { FUN }
   | "->" { ARROW }
   | "let" { LET }

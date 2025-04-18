@@ -17,10 +17,7 @@ let convert in_format out_format str =
     let signal =
       match in_format with
       | LambdaSC -> (
-        match
-          Option.map
-            Lambda_sc.eval
-            (Lambda_sc.parse str) with
+        match Lambda_sc.interp str with
         | Some signal -> signal
         | _ -> failwith "Invalid source signal"
       )

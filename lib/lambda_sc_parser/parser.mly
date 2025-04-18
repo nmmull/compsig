@@ -16,11 +16,14 @@ open Syntax
 %token T "t"
 %token FUN "fun"
 %token ARROW "->"
+%token COLON ":"
+%token SIGNAL "signal"
 %token EOF
 
 %left PLUS
 %left TIMES
 %left COMP
+%right ARROW
 
 %start <Syntax.expr> prog
 
@@ -29,8 +32,14 @@ open Syntax
 prog:
   | e=expr EOF { e }
 
+ty:
+  | "signal" { SignalTy }
+  | t1=ty "->" t2=ty { FunTy (t1, t2) }
+
+annot:
+  | ":" ty=ty { ty }
 expr:
-  | "let" x=VAR "=" e1=expr "in" e2=expr { App (Fun (x, e2), e1) }
+  | "let" x=VAR ty=annot? "=" e1=expr "in" e2=expr { Let (x, Option.value ~default:SignalTy ty, e1, e2) }
   | "fun" xs=VAR+ "->" e=expr { List.fold_right (fun x e -> Fun(x, e)) xs e }
   | e=expr1 { e }
 

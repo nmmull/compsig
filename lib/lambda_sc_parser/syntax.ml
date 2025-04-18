@@ -1,3 +1,7 @@
+type ty =
+  | SignalTy
+  | FunTy of ty * ty
+
 type bop = Add | Mul | Comp
 
 type expr =
@@ -8,3 +12,4 @@ type expr =
   | Var of string
   | Fun of string * expr
   | App of expr * expr
+  | Let of string * ty * expr * expr
