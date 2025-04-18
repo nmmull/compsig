@@ -27,7 +27,21 @@ module Make (C : COEFFICIENT) (B : Utils.BASE) = struct
   let of_coefficient c = of_list [c, M.one]
 
   let compare = P.compare C.compare
-  let pp = Fmt.nop
+
+  let to_string l = 
+    let rec go first = function
+      | [] -> ""
+      | (key, value) :: rest -> 
+        if first then
+          let outstring = "(" ^ (Fmt.to_to_string C.pp key) ^ ")" ^ (Fmt.to_to_string M.pp value) in
+          outstring ^ go false rest
+        else
+          let outstring = " + (" ^ (Fmt.to_to_string C.pp key) ^ ")"  ^ (Fmt.to_to_string M.pp value) in
+          outstring ^ go false rest
+      in
+      go true l
+
+  let pp = Fmt.using to_list (Fmt.of_to_string to_string)
 
   let fold accum = P.fold (fun mon coeff -> accum coeff mon)
 

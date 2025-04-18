@@ -22,7 +22,7 @@
  (depends
    ocaml
    alcotest
-   fmt
+   fmt cmdliner
    cmdliner)
  (tags
   ("algebraic signal processing"

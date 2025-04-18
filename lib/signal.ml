@@ -11,8 +11,8 @@ module rec P : Polynomial_intf.POLYNOMIAL
           with type base = Base.t
           with type monomial = Monomial.Make(Base).t
   = Polynomial.Make(Utils.FloatCoefficient)(Base)
-  and Base : Utils.BASE with type t = P.t base_signal = struct
-    type t = P.t base_signal
+    and Base : Utils.BASE with type t = P.t base_signal = struct
+  type t = P.t base_signal
 
     let order_base_signal p =
       match p with
@@ -47,8 +47,16 @@ module rec P : Polynomial_intf.POLYNOMIAL
           else
             P.compare (extract_poly p1) (extract_poly p2)
 
-    let pp = Fmt.nop
-  end
+  let to_string = function
+    | Ident -> "t"
+    | Sin signal -> "sin(" ^ Fmt.to_to_string P.pp signal ^ ")"
+    | Triangle signal -> "triangle(" ^ Fmt.to_to_string P.pp signal ^ ")"
+    | Saw signal -> "saw(" ^ Fmt.to_to_string P.pp signal ^ ")"
+    | Square signal -> "square(" ^ Fmt.to_to_string P.pp signal ^ ")"
+    | Noise signal -> "noise(" ^ Fmt.to_to_string P.pp signal ^ ")" 
+
+  let pp = Fmt.of_to_string to_string
+end
 
 include P
 module M = Monomial.Make(Base)
@@ -119,9 +127,9 @@ let rec to_expr (s : t) =
   |> P.to_list
   |> List.map (fun (c, m) ->
         let m = monomial_to_expr m in
-        if c = 1.
-        then m
-        else Syntax.Prod [Syntax.Const c; m])
+          if c = 1.
+            then m
+          else Syntax.Prod [Syntax.Const c; m])
   |> List.filter ((<>) (Syntax.Const 0.))
   |> fun l -> Syntax.Sum l
 and monomial_to_expr mono =
