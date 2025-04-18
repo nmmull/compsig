@@ -5,10 +5,14 @@ module Matplotlib = struct
     let rec go = function
       | Ident -> "x"
       | Const f -> string_of_float f
-      | Sin e -> "np.sin(" ^ go e ^ ")"
+      | Sin e -> "np.sin(" ^ go e^ ")"
+      | Triangle _ -> assert false
+      | Saw _ -> assert false
+      | Square _ -> assert false
+      | Noise _ -> assert false
       | Sum es -> (
          match es with
-         | [] -> "0.0"
+         | [] -> ""
          | e :: es ->
             List.fold_left
               (fun acc e -> acc ^ " + " ^ go e)
@@ -16,13 +20,13 @@ module Matplotlib = struct
               es
       )
       | Prod es -> (
-         match es with
-         | [] -> "1.0"
-         | e :: es ->
-            List.fold_left
-              (fun acc e -> acc ^ " * " ^ go e)
-              (go e)
-              es
+        match es with
+        | [] -> ""
+        | e :: es ->
+          List.fold_left
+            (fun acc e -> acc ^ " * " ^ go e)
+            (go e)
+            es
       )
       | Pow (e, n) ->
          let e = go e in
@@ -37,7 +41,7 @@ module Matplotlib = struct
         [
           "import matplotlib.pyplot as plt";
           "import numpy as np";
-          "x = np.linspace(0, 10, int(44100 * 10))";
+          "x = np.linspace(0, 10, int(44100 * 10))"; (* TODO: Abstract over duration *)
           "y = " ^ string_of_expr (Signal.to_expr s);
           "fig, ax = plt.subplots()";
           "ax.plot(x, y)";
@@ -49,7 +53,7 @@ end
 module Supercollider = struct
   let of_expr =
     let rec go = function
-      | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)"
+      | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)" (* TODO: Abstract over duration *)
       | Const f -> string_of_float f ^ "0"
       | Sin e ->
          let signal = Signal.of_expr e in
@@ -64,25 +68,16 @@ module Supercollider = struct
              go phase;
              ")"
            ]
-      | Sum es -> (
-         match es with
-         | [] -> "0.0"
-         | e :: es ->
+      | Sum es ->
             List.fold_left
               (fun acc e -> acc ^ " + " ^ go e)
-              (go e)
+              "0.0"
               es
-      )
-      | Prod es -> (
-        match es with
-        | [] -> "1.0"
-        | e :: es ->
+      | Prod es ->
            List.fold_left
              (fun acc e -> acc ^ " * " ^ go e)
-             (go e)
+             "1.0"
              es
-      )
-      | Pow (e, n) -> go (Prod (List.init n (fun _ -> e)))
     in go
 
   let of_signal s =
