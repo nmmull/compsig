@@ -1,3 +1,3 @@
 (library
  (name compsig)
- (libraries fmt alcotest))
+ (libraries fmt alcotest lambda_sc_parser))

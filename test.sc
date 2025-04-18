@@ -1,0 +1,1 @@
+s.waitForBoot({{SinOsc.ar(freq: 1.0, phase: 0.0) * SinOsc.ar(freq: 440.0 * 1.0, phase: 0.0)}.play;});

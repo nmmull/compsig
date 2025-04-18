@@ -68,6 +68,41 @@ let rec comp_base base signal =
 
 let comp = P.comp comp_base
 
+let rec linearize (s : t) =
+  let combiner coeff mono (has_t, no_t) =
+    let (mon_has_t, mon_no_t) = linearize_mono mono in
+    (
+      P.add
+        (P.mul (const coeff) mon_has_t)
+        has_t
+    , P.add
+        (P.mul (const coeff) mon_no_t)
+        no_t
+    )
+  in
+  P.fold combiner s (P.zero, P.zero)
+and linearize_mono mono =
+  let l = M.to_list mono in
+  let of_mono m =
+    m
+    |> M.of_list
+    |> P.of_monomial
+  in
+  let rec go acc = function
+    | [] -> (const 0., of_mono acc)
+    | (Ident, n) :: l -> (of_mono ((Ident, n - 1) :: l @ acc), const 0.)
+    | t :: l -> go (t :: acc) l
+  in go [] l
+
+let rec of_expr e =
+  let open Syntax in
+  match e with
+  | Ident -> ident
+  | Const f -> const f
+  | Sin e -> sin (of_expr e)
+  | Sum es -> List.fold_left P.add P.zero (List.map of_expr es)
+  | Prod es -> List.fold_left P.mul P.one (List.map of_expr es)
+
 let rec to_expr (s : t) =
   s
   |> P.to_list
@@ -81,7 +116,7 @@ let rec to_expr (s : t) =
 and monomial_to_expr mono =
   mono
   |> M.to_list
-  |> List.map (fun (b, e) -> Syntax.Pow (base_signal_to_expr b, e))
+  |> List.map (fun (b, e) -> Syntax.Prod (List.init e (fun _ -> base_signal_to_expr b)))
   |> fun l -> Syntax.Prod l
 and base_signal_to_expr = function
   | Ident -> Syntax.Ident

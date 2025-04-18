@@ -7,7 +7,10 @@ module type MONOMIAL = sig
 
   val of_list : (base * int) list -> t
   val to_list : t -> (base * int) list
+  val of_base : base -> t
   val fold : (base -> int -> 'acc -> 'acc) -> t -> 'acc -> 'acc
+
+  val exponent : base -> t -> int
 end
 
 module type MAKER = functor (B : Utils.BASE) -> MONOMIAL with type base = B.t

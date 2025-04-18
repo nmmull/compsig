@@ -9,4 +9,3 @@ type expr =
   | Noise of expr
   | Sum of expr list
   | Prod of expr list
-  | Pow of expr * int

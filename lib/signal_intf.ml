@@ -18,6 +18,9 @@ module type Intf = sig
   val const : float -> t
 
   val to_expr : t -> expr
+  val of_expr : expr -> t
+
+  val linearize : t -> t * t
 
   val comp_base : t base_signal -> t -> t
   val comp : t -> t -> t
