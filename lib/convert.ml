@@ -6,6 +6,10 @@ module Matplotlib = struct
       | Ident -> "x"
       | Const f -> string_of_float f
       | Sin e -> "np.sin(" ^ go e^ ")"
+      | Triangle _ -> assert false
+      | Saw _ -> assert false
+      | Square _ -> assert false
+      | Noise _ -> assert false
       | Sum es -> (
          match es with
          | [] -> ""
