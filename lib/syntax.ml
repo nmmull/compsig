@@ -5,4 +5,3 @@ type expr =
   | Sin of expr
   | Sum of expr list
   | Prod of expr list
-  | Pow of expr * int

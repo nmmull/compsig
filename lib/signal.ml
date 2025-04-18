@@ -68,9 +68,6 @@ let rec of_expr e =
   | Sin e -> sin (of_expr e)
   | Sum es -> List.fold_left P.add P.zero (List.map of_expr es)
   | Prod es -> List.fold_left P.mul P.one (List.map of_expr es)
-  | Pow (e, n) ->
-     let module R = Utils.Mul_monoid(P) in
-     R.pow (of_expr e) n
 
 let rec to_expr (s : t) =
   s
@@ -85,7 +82,7 @@ let rec to_expr (s : t) =
 and monomial_to_expr mono =
   mono
   |> M.to_list
-  |> List.map (fun (b, e) -> Syntax.Pow (base_signal_to_expr b, e))
+  |> List.map (fun (b, e) -> Syntax.Prod (List.init e (fun _ -> base_signal_to_expr b)))
   |> fun l -> Syntax.Prod l
 and base_signal_to_expr = function
   | Ident -> Syntax.Ident

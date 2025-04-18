@@ -3,10 +3,8 @@ open Syntax
 %}
 
 %token <float> FLOAT
-%token <int> INT
 %token <string> VAR
 %token SIN "sin"
-%token POW "pow"
 %token PLUS "+"
 %token TIMES "*"
 %token COMP "<<"
@@ -15,8 +13,9 @@ open Syntax
 %token IN "in"
 %token LPAREN "("
 %token RPAREN ")"
-%token COMMA ","
 %token T "t"
+%token FUN "fun"
+%token ARROW "->"
 %token EOF
 
 %left PLUS
@@ -31,7 +30,8 @@ prog:
   | e=expr EOF { e }
 
 expr:
-  | "let" x=VAR "=" e1=expr "in" e2=expr { Let (x, e1, e2) }
+  | "let" x=VAR "=" e1=expr "in" e2=expr { App (Fun (x, e2), e1) }
+  | "fun" xs=VAR+ "->" e=expr { List.fold_right (fun x e -> Fun(x, e)) xs e }
   | e=expr1 { e }
 
 %inline bop:
@@ -41,12 +41,11 @@ expr:
 
 expr1:
   | e1=expr1 op=bop e2=expr1 { Bop(op, e1, e2) }
-  | "sin" "(" e1=expr2 "," e2=expr2 ")" { Sin {freq= Bop(Mul, e1, Ident) ;phase=e2} }
-  | e=expr2 { e }
+  | es=expr2+ { List.(fold_left (fun e1 e2 -> App (e1, e2)) (hd es) (tl es)) }
 
 expr2:
   | n=FLOAT { Float n }
+  | "sin" { Sin }
   | "t" { Ident }
   | x=VAR { Var x }
-  | "pow" "(" e=expr1 "," n=INT ")" { Pow(e, n) }
   | "(" e=expr ")" { e }

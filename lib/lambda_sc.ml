@@ -8,22 +8,57 @@ let parse s =
 
 module Env = Map.Make(String)
 
+type ty =
+  | SignalTy
+  | FunTy of ty * ty
+
+type value =
+  | VClos of string * expr * value Env.t
+  | VSignal of Signal.t
+
+exception UnexpectedError
+
+let rec type_of ctxt e =
+  let open Signal in
+  let rec go e = function
+    | Float _ -> Some SignalTy
+    | Ident -> Some SignalTy
+    | Sin -> Some SignalTy
+    | Bop (op, e1, e2) -> (
+       match go e1, go e2 with
+       | Some SignalTy, Some SignalTy -> Some SignalTy
+       | _ -> None
+    )
+    |
+
+
+
 let rec eval env =
   let open Signal in
   let rec go = function
-    | Float f -> const f
-    | Ident -> ident
-    | Sin {freq;phase} ->
-       sin (add
-              (mul (const (2. *. Float.pi)) (go freq))
-              (go phase))
-    | Bop (Add, e1, e2) -> add (go e1) (go e2)
-    | Bop (Mul, e1, e2) -> mul (go e1) (go e2)
-    | Bop (Comp, e1, e2) -> comp (go e1) (go e2)
-    | Pow (e1, exp) ->
-       let module M = Utils.Mul_monoid(Signal) in
-       M.pow (go e1) exp
+    | Float f -> VSignal (const f)
+    | Ident -> VSignal ident
+    | Sin -> VSignal (sin ident)
+    | Bop (bop, e1, e2) -> (
+       match go e1, go e2 with
+       | VSignal s1, VSignal s2 -> (
+          match bop with
+          | Add -> VSignal (add s1 s2)
+          | Mul -> VSignal (mul s1 s2)
+          | Comp -> VSignal (comp s1 s2)
+       )
+       | _ -> raise UnexpectedError
+    )
     | Var x -> Env.find x env (* TODO: Better error handling *)
-    | Let(x, e1, e2) -> eval (Env.add x (go e1) env) e2
+    | Fun (x, e) -> VClos (x, e, env)
+    | App (e1, e2) -> (
+       match go e1 with
+       | VClos (x, e, env) -> eval (Env.add x (go e2) env) e
+       | _ -> raise UnexpectedError
+    )
   in go
-let eval = eval Env.empty
+
+let eval e =
+  match eval Env.empty e with
+  | VSignal s -> s
+  | _ -> raise UnexpectedError
