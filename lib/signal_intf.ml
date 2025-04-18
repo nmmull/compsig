@@ -4,6 +4,10 @@ module type Intf = sig
   type 'a base_signal =
     | Ident
     | Sin of 'a
+    | Triangle of 'a
+    | Saw of 'a
+    | Square of 'a
+    | Noise of 'a
   type t
   include Utils.COMPARE with type t := t
   include Utils.PP with type t := t
@@ -11,6 +15,10 @@ module type Intf = sig
 
   val ident : t
   val sin : t -> t
+  val triangle : t -> t
+  val saw : t -> t
+  val square : t -> t
+  val noise : t -> t
   val const : float -> t
 
   val to_expr : t -> expr

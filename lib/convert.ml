@@ -68,6 +68,10 @@ module Supercollider = struct
              go phase;
              ")"
            ]
+      | Triangle _ -> assert false
+      | Saw _ -> assert false
+      | Square _ -> assert false
+      | Noise _ -> assert false
       | Sum es ->
             List.fold_left
               (fun acc e -> acc ^ " + " ^ go e)
@@ -78,6 +82,7 @@ module Supercollider = struct
              (fun acc e -> acc ^ " * " ^ go e)
              "1.0"
              es
+      | Pow (e, n) -> go (Prod (List.init n (fun _ -> e)))
     in go
 
   let of_signal s =

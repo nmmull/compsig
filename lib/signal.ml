@@ -110,6 +110,9 @@ let rec of_expr e =
   | Noise e -> noise (of_expr e)
   | Sum es -> List.fold_left P.add P.zero (List.map of_expr es)
   | Prod es -> List.fold_left P.mul P.one (List.map of_expr es)
+  | Pow (e, n) ->
+    let module R = Utils.Mul_monoid(P) in
+    R.pow (of_expr e) n
 
 let rec to_expr (s : t) =
   s
