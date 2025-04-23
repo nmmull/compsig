@@ -7,15 +7,17 @@ module Matplotlib = struct
       | Const f -> string_of_float f
       | Sin e -> "np.sin(" ^ go e ^ ")"
       | Sum es ->
-         List.fold_left
-           (fun acc e -> acc ^ " + " ^ go e)
-           "0.0"
-           es
+        es
+        |> List.map go
+        |> List.filter ((<>) "0.0")
+        |> (fun l -> if List.is_empty l then ["0.0"] else l)
+        |> String.concat " + "
       | Prod es ->
-         List.fold_left
-           (fun acc e -> acc ^ " * " ^ go e)
-           "1.0"
-           es
+        es
+        |> List.map go
+        |> List.filter ((<>) "1.0")
+        |> (fun l -> if List.is_empty l then ["1.0"] else l)
+        |> String.concat " * "
     in go
 
   let of_signal (s : Signal.t) : string =
@@ -52,15 +54,17 @@ module SuperCollider = struct
              ")"
            ]
       | Sum es ->
-            List.fold_left
-              (fun acc e -> acc ^ " + " ^ go e)
-              "0.0"
-              es
+        es
+        |> List.map go
+        |> List.filter ((<>) "0.0")
+        |> (fun l -> if List.is_empty l then ["0.0"] else l)
+        |> String.concat " + "
       | Prod es ->
-           List.fold_left
-             (fun acc e -> acc ^ " * " ^ go e)
-             "1.0"
-             es
+        es
+        |> List.map go
+        |> List.filter ((<>) "1.0")
+        |> (fun l -> if List.is_empty l then ["1.0"] else l)
+        |> String.concat " * "
     in go
 
   let of_signal s =
