@@ -47,7 +47,6 @@ module Make (C : COEFFICIENT) (B : Utils.BASE) = struct
 
   let pp = Fmt.of_to_string to_string
 
-
   let zero = of_list []
   let one = of_list [C.one, M.one]
 
