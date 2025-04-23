@@ -14,7 +14,6 @@ depends: [
   "ocaml"
   "alcotest"
   "fmt"
-  "cmdliner"
   "odoc" {with-doc}
 ]
 build: [
