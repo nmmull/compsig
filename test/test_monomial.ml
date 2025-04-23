@@ -9,9 +9,8 @@ module Variable = struct
     else if v1 = v2
     then 0
     else 1
-  
-  let to_string ty =
-    match ty with
+
+  let to_string = function
     | X -> "x"
     | Y -> "y"
     | Z -> "z"
