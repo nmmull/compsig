@@ -3,11 +3,11 @@ type 'a base_signal =
   | Sin of 'a
 
 module rec P : Polynomial_intf.POLYNOMIAL
-          with type coefficient = float
-          with type base = Base.t
-          with type monomial = Monomial.Make(Base).t
+  with type coefficient = float
+  with type base = Base.t
+  with type monomial = Monomial.Make(Base).t
   = Polynomial.Make(Utils.FloatCoefficient)(Base)
-    and Base : Utils.BASE with type t = P.t base_signal = struct
+and Base : Utils.BASE with type t = P.t base_signal = struct
   type t = P.t base_signal
 
   let compare b1 b2 =
