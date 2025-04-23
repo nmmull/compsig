@@ -1,61 +1,36 @@
-open Compsig
 open Cmdliner
 
-exception InvalidInputType
-exception InvalidOutputType
+let in_formats =
+  [
+    "lsc", `LambdaSC;
+  ]
 
-let compsig_func f_in f_out =
-    let input = match f_in with
-        | "sc" -> SuperCollider
-        | "lsc" -> LambdaSC
-        | "py" -> Matplotlib
-        | _ -> raise InvalidInputType
-    in
-    let output = match f_out with
-        | "sc" -> SuperCollider
-        | "lsc" -> LambdaSC
-        | "py" -> Matplotlib
-        | _ -> raise InvalidOutputType
-    in
-    let standin = In_channel.(input_all stdin) in
-    print_string (convert input output standin)
+let out_formats =
+  [
+    "lsc", `LambdaSC;
+    "sc", `SuperCollider;
+    "py", `Matplotlib;
+  ]
 
-let file_in =
-    let doc = "The filetype of the input." in
-    Arg.(value (opt string "empty filename" (info ["i"; "input"] ~doc ~docv:"FILE_IN")))
+let in_format_t =
+  let doc = "The filetype of the input. See TODO for supported formats." in
+  Arg.(value (opt (enum in_formats) `LambdaSC (info ["i"; "input"] ~doc)))
 
-let file_out =
-    let doc = "The filetype of the output." in
-    Arg.(value (opt string "empty filename" (info ["o"; "output"] ~doc ~docv:"FILE_OUT")))
+let out_format_t =
+  let doc = "The filetype of the output. See TODO for supported formats." in
+  Arg.(value (opt (enum out_formats) `Matplotlib (info ["o"; "output"] ~doc)))
 
-let compsig_t = Term.(const compsig_func $ file_in $ file_out)
+let convert in_format out_format =
+  In_channel.(input_all stdin)
+  |> Compsig.convert in_format out_format
+  |> print_string
+
+let compsig_t = Term.(const convert $ in_format_t $ out_format_t)
 
 let compsig_cmd =
-    let doc = "Port representations of signals between different languages." in
-    let man = [] in
-    let info = Cmd.info "Compsig" ~version:"0.1" ~doc ~man in
-    Cmd.v info compsig_t
+  let doc = "signal converter" in
+  let info = Cmd.info "Compsig" ~version:Compsig.ver_num ~doc in
+  Cmd.v info compsig_t
 
 let main () = exit (Cmd.eval compsig_cmd)
-
 let () = main ()
-(*
-let superscript num = print_endline (int_to_exponent num)
-
-let number =
-    let doc = "The number to superscript." in
-    Arg.(value (opt int 0 (info ["s"; "superscript"] ~doc ~docv:"SUPERSCRIPT")))
-
-let superscript_t = Term.(const superscript $ number)
-
-let superscript_cmd =
-    let doc = "Print the superscript of a number" in
-    let man = [
-        `S Manpage.s_bugs;
-        `P "I'on't know what you're talking about."]
-    in
-    let info = Cmd.info "superscript" ~version:"0.1" ~doc ~man in
-    Cmd.v info superscript_t
-
-let main () = exit (Cmd.eval superscript_cmd)
-*)
