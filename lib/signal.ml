@@ -12,10 +12,10 @@ and Base : Utils.BASE with type t = P.t base_signal = struct
 
   let compare b1 b2 =
     match b1, b2 with
-      | Ident, Ident -> 0
-      | Ident, _ -> -1
-      | _, Ident -> 1
-      | Sin p1, Sin p2 -> P.compare p1 p2
+    | Ident, Ident -> 0
+    | Ident, _ -> -1
+    | _, Ident -> 1
+    | Sin p1, Sin p2 -> P.compare p1 p2
 
   let to_string = function
     | Ident -> "t"
@@ -33,19 +33,21 @@ let const = P.of_coefficient
 
 let rec comp_base base signal =
   match base with
-    | Ident -> signal
-    | Sin p1 -> P.of_base (Sin (P.comp comp_base p1 signal))
+  | Ident -> signal
+  | Sin p1 -> P.of_base (Sin (P.comp comp_base p1 signal))
 
 let comp = P.comp comp_base
 
-let rec to_expr (s : t) =
+let rec to_expr s =
+  let expr_of_mon (c, m) =
+    let m = monomial_to_expr m in
+    if c = 1.
+    then m
+    else Syntax.Prod [Syntax.Const c; m]
+  in
   s
   |> P.to_list
-  |> List.map (fun (c, m) ->
-        let m = monomial_to_expr m in
-          if c = 1.
-            then m
-          else Syntax.Prod [Syntax.Const c; m])
+  |> List.map expr_of_mon
   |> List.filter ((<>) (Syntax.Const 0.))
   |> fun l -> Syntax.Sum l
 and monomial_to_expr mono =
