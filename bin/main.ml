@@ -1,28 +1,21 @@
 open Compsig
 open Cmdliner
 
+exception InvalidInputType
+exception InvalidOutputType
 
-(*
-type conversion_info = 
-    {
-        input_type : supported_file_types;
-        output_type : supported_file_types;
-    }
-*)
-
-
-let compsig_func f_in f_out = 
+let compsig_func f_in f_out =
     let input = match f_in with
         | "sc" -> SuperCollider
         | "lsc" -> LambdaSC
         | "py" -> Matplotlib
-        | _ -> failwith "Invalid file type"
+        | _ -> raise InvalidInputType
     in
     let output = match f_out with
         | "sc" -> SuperCollider
         | "lsc" -> LambdaSC
         | "py" -> Matplotlib
-        | _ -> failwith "Invalid file type"
+        | _ -> raise InvalidOutputType
     in
     let standin = In_channel.(input_all stdin) in
     print_string (convert input output standin)
