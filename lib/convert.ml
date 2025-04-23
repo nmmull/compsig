@@ -33,7 +33,7 @@ module Matplotlib = struct
     in prog
 end
 
-module Supercollider = struct
+module SuperCollider = struct
   let of_expr =
     let rec go = function
       | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)" (* TODO: Abstract over duration *)
