@@ -10,6 +10,6 @@ type expr =
   | Sin
   | Bop of bop * expr * expr
   | Var of string
-  | Fun of string * expr
+  | Fun of string * ty * expr
   | App of expr * expr
-  | Let of string * ty * expr * expr
+  | Let of string * expr * expr

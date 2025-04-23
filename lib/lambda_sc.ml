@@ -19,33 +19,26 @@ let rec type_of ctxt =
     | Float _ -> Some SignalTy
     | Ident -> Some SignalTy
     | Sin -> Some SignalTy
-    | Bop (_, e1, e2) ->
-       if type_check ctxt (e1, SignalTy) && type_check ctxt (e2, SignalTy)
-       then Some SignalTy
-       else None
+    | Bop (_, e1, e2) -> (
+       match go e1, go e2 with
+       | Some SignalTy, Some SignalTy -> Some SignalTy
+       | _ -> None
+    )
     | Var x -> Env.find_opt x ctxt
     | App (e1, e2) -> (
-      match go e1 with
-      | Some FunTy (t1, t2) ->
-         if type_check ctxt (e2, t1)
-         then Some t2
-         else None
+      match go e1, go e2 with
+      | Some FunTy (t1, t2), Some t3 when t1 = t3 -> Some t2
       | _ -> None
     )
-    | Fun (x, e) -> type_of (Env.add x SignalTy ctxt) e
-    | Let (x, ty, e1, e2) ->
-       if type_check ctxt (e1, ty)
-       then type_of (Env.add x ty ctxt) e2
-       else None
-  in go
-and type_check ctxt =
-  let go = function
-    | Fun (x, e), FunTy (a, b) -> type_check (Env.add x a ctxt) (e, b)
-    | e, ty -> (
-      match type_of ctxt e with
-      | Some ty' -> ty' = ty
-      | _ -> false
+    | Fun (x, ty, e) -> (
+      match type_of (Env.add x ty ctxt) e with
+      | Some t2 -> Some (FunTy (ty, t2))
+      | _ -> None
     )
+    | Let (x, e1, e2) ->
+       match type_of ctxt e1 with
+       | Some ty -> type_of (Env.add x ty ctxt) e2
+       | _ -> None
   in go
 
 let rec eval env =
@@ -65,13 +58,13 @@ let rec eval env =
        | _ -> raise UnexpectedError
     )
     | Var x -> Env.find x env (* TODO: Better error handling *)
-    | Fun (x, e) -> VClos (x, e, env)
+    | Fun (x, _, e) -> VClos (x, e, env)
     | App (e1, e2) -> (
        match go e1 with
        | VClos (x, e, env) -> eval (Env.add x (go e2) env) e
        | _ -> raise UnexpectedError
     )
-    | Let (x, _, e1, e2) -> eval (Env.add x (go e1) env) e2
+    | Let (x, e1, e2) -> eval (Env.add x (go e1) env) e2
   in go
 
 let eval e =
@@ -79,9 +72,14 @@ let eval e =
   | VSignal s -> s
   | _ -> raise UnexpectedError
 
+exception ParseError
+exception TypeError
+
 let interp str =
-  let ( let* ) = Option.bind in
-  let* e = parse str in
-  if type_check Env.empty (e, SignalTy)
-  then Some (eval e)
-  else None
+  match parse str with
+  | Some e -> (
+    match type_of Env.empty e with
+    | Some SignalTy -> eval e
+    | _ -> raise TypeError
+  )
+  | _ -> raise ParseError

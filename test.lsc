@@ -1,5 +1,7 @@
 let pi = 3.14159265358979312 in
-let sin_osc : signal -> signal -> signal = fun freq phase -> sin << (2. * pi * freq + phase) in
+let sin_osc = fun freq phase ->
+  sin << (2. * pi * freq + phase)
+in
 let s1 = sin_osc 440. 0. in
 let s2 = sin_osc 1. 0. in
 s2 * s1

@@ -16,11 +16,7 @@ let convert in_format out_format str =
   else
     let signal =
       match in_format with
-      | LambdaSC -> (
-        match Lambda_sc.interp str with
-        | Some signal -> signal
-        | _ -> failwith "Invalid source signal"
-      )
+      | LambdaSC -> Lambda_sc.interp str
       | _ -> failwith "Not implemented"
     in
     match out_format with

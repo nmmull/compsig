@@ -35,12 +35,17 @@ prog:
 ty:
   | "signal" { SignalTy }
   | t1=ty "->" t2=ty { FunTy (t1, t2) }
+  | "(" ty=ty ")" { ty }
 
-annot:
-  | ":" ty=ty { ty }
+
+
+arg:
+  | x=VAR { (x, SignalTy) }
+  | "(" x=VAR ":" ty=ty ")" { (x, ty) }
+
 expr:
-  | "let" x=VAR ty=annot? "=" e1=expr "in" e2=expr { Let (x, Option.value ~default:SignalTy ty, e1, e2) }
-  | "fun" xs=VAR+ "->" e=expr { List.fold_right (fun x e -> Fun(x, e)) xs e }
+  | "let" x=VAR "=" e1=expr "in" e2=expr { Let (x, e1, e2) }
+  | "fun" xs=arg+ "->" e=expr { List.fold_right (fun (x, ty) e -> Fun(x, ty, e)) xs e }
   | e=expr1 { e }
 
 %inline bop:
