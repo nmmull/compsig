@@ -1,3 +1,5 @@
 (test
  (name test_compsig)
  (libraries compsig alcotest))
+
+(cram (deps %{bin:compsig}))

@@ -1,4 +1,5 @@
 (lang dune 3.17)
+(cram enable)
 (name compsig)
 (generate_opam_files true)
 
