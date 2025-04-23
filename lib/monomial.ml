@@ -22,14 +22,15 @@ module Make (B : Utils.BASE) = struct
 
   let compare = M.compare Int.compare
 
-  let to_string l = 
-    let rec go = function
-      | [] -> ""
-      | (key, value) :: rest -> 
-        let outstring = (Fmt.to_to_string B.pp key) ^ (Utils.int_to_exponent value) in
-        outstring ^ go rest
-      in
-      go l
+  let to_string m =
+    let string_of_term (base, exp) =
+      Fmt.to_to_string B.pp base
+      ^ Utils.int_to_exponent exp
+    in
+    m
+    |> to_list
+    |> List.map string_of_term
+    |> String.concat ""
 
-  let pp = Fmt.using to_list (Fmt.of_to_string to_string)
+  let pp = Fmt.of_to_string to_string
 end
