@@ -69,30 +69,29 @@ module IntCoefficient = struct
   let pp = Fmt.int
 end
 
-let int_to_exponent (input : int) : string =
-  let rec go output_string = function
-    | 0 -> output_string
-    | num -> 
-      let take_value value =
-        let ones = value mod 10 in
-        let other = value - ones in
-        let find_exp n = 
-          match n with
-          | 0 -> "⁰"
-          | 1 -> "¹"
-          | 2 -> "²"
-          | 3 -> "³"
-          | 4 -> "⁴"
-          | 5 -> "⁵"
-          | 6 -> "⁶"
-          | 7 -> "⁷"
-          | 8 -> "⁸"
-          | 9 -> "⁹"
-          | _ -> assert false
-        in
-        find_exp ones, other
-      in
-      match take_value num with
-      | (expon, other) -> go (expon ^ output_string) (other / 10)
+let int_to_exponent n =
+  let to_exp = function
+    | 0 -> "⁰"
+    | 1 -> "¹"
+    | 2 -> "²"
+    | 3 -> "³"
+    | 4 -> "⁴"
+    | 5 -> "⁵"
+    | 6 -> "⁶"
+    | 7 -> "⁷"
+    | 8 -> "⁸"
+    | 9 -> "⁹"
+    | _ -> failwith "impossible"
   in
-  go "" input
+  let digits n =
+    let rec go out n =
+      if n = 0
+      then List.rev out
+      else go (n mod 10 :: out) (n / 10)
+    in
+    if n = 0
+    then [0]
+    else if n > 0
+    then go [] n
+    else failwith "unexpected error: no negative exponents"
+  in n |> digits |> List.map to_exp |> String.concat ""
