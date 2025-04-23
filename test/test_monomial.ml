@@ -10,7 +10,12 @@ module Variable = struct
     then 0
     else 1
 
-  let pp = Fmt.nop
+  let to_string = function
+    | X -> "x"
+    | Y -> "y"
+    | Z -> "z"
+
+  let pp = Fmt.of_to_string to_string
 end
 
 module M = Compsig.Monomial.Make(Variable)

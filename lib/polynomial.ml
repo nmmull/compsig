@@ -27,9 +27,25 @@ module Make (C : COEFFICIENT) (B : Utils.BASE) = struct
   let of_coefficient c = of_list [c, M.one]
 
   let compare = P.compare C.compare
-  let pp = Fmt.nop
 
   let fold accum = P.fold (fun mon coeff -> accum coeff mon)
+
+  let to_string p =
+    let string_of_term (coeff, mon) =
+      String.concat ""
+        [
+          "(";
+          Fmt.to_to_string C.pp coeff;
+          Fmt.to_to_string M.pp mon;
+          ")";
+        ]
+    in
+    p
+    |> to_list
+    |> List.map string_of_term
+    |> String.concat " + "
+
+  let pp = Fmt.of_to_string to_string
 
   let zero = of_list []
   let one = of_list [C.one, M.one]

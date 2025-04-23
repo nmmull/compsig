@@ -3,22 +3,26 @@ type 'a base_signal =
   | Sin of 'a
 
 module rec P : Polynomial_intf.POLYNOMIAL
-           with type coefficient = float
-           with type base = Base.t
-           with type monomial = Monomial.Make(Base).t
+  with type coefficient = float
+  with type base = Base.t
+  with type monomial = Monomial.Make(Base).t
   = Polynomial.Make(Utils.FloatCoefficient)(Base)
-   and Base : Utils.BASE with type t = P.t base_signal = struct
-     type t = P.t base_signal
+and Base : Utils.BASE with type t = P.t base_signal = struct
+  type t = P.t base_signal
 
-     let compare b1 b2 =
-       match b1, b2 with
-       | Ident, Ident -> 0
-       | Ident, _ -> -1
-       | _, Ident -> 1
-       | Sin p1, Sin p2 -> P.compare p1 p2
+  let compare b1 b2 =
+    match b1, b2 with
+    | Ident, Ident -> 0
+    | Ident, _ -> -1
+    | _, Ident -> 1
+    | Sin p1, Sin p2 -> P.compare p1 p2
 
-     let pp = Fmt.nop
-   end
+  let to_string = function
+    | Ident -> "t"
+    | Sin signal -> "sin(" ^ Fmt.to_to_string P.pp signal ^ ")"
+
+  let pp = Fmt.of_to_string to_string
+end
 
 include P
 module M = Monomial.Make(Base)
@@ -34,7 +38,7 @@ let rec comp_base base signal =
 
 let comp = P.comp comp_base
 
-let rec linearize (s : t) =
+let rec linearize s =
   let combiner coeff mono (has_t, no_t) =
     let (mon_has_t, mon_no_t) = linearize_mono mono in
     (
@@ -69,14 +73,16 @@ let rec of_expr e =
   | Sum es -> List.fold_left P.add P.zero (List.map of_expr es)
   | Prod es -> List.fold_left P.mul P.one (List.map of_expr es)
 
-let rec to_expr (s : t) =
+let rec to_expr s =
+  let expr_of_mon (c, m) =
+    let m = monomial_to_expr m in
+    if c = 1.
+    then m
+    else Syntax.Prod [Syntax.Const c; m]
+  in
   s
   |> P.to_list
-  |> List.map (fun (c, m) ->
-         let m = monomial_to_expr m in
-         if c = 1.
-         then m
-         else Syntax.Prod [Syntax.Const c; m])
+  |> List.map expr_of_mon
   |> List.filter ((<>) (Syntax.Const 0.))
   |> fun l -> Syntax.Sum l
 and monomial_to_expr mono =
