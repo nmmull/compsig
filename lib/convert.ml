@@ -4,8 +4,12 @@ module Matplotlib = struct
   let string_of_expr =
     let rec go = function
       | Ident -> "x"
+      | Noise -> "np.random.uniform(-1, 1, x.shape)"
       | Const f -> string_of_float f
       | Sin e -> "np.sin(" ^ go e ^ ")"
+      | Triangle e -> "sp.sawtooth(" ^ go e ^ ", 0.5)"
+      | Saw e -> "sp.sawtooth(" ^ go e ^ ")"
+      | Square e -> "sp.square(" ^ go e ^ ")"
       | Sum es ->
         es
         |> List.map go
@@ -26,6 +30,7 @@ module Matplotlib = struct
         [
           "import matplotlib.pyplot as plt";
           "import numpy as np";
+          "import scipy.signal as sp";
           "x = np.linspace(0, 10, int(44100 * 10))"; (* TODO: Abstract over duration *)
           "y = " ^ string_of_expr (Signal.to_expr s);
           "fig, ax = plt.subplots()";
@@ -40,6 +45,7 @@ module SuperCollider = struct
     let rec go = function
       | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)" (* TODO: Abstract over duration *)
       | Const f -> string_of_float f ^ "0"
+      | Noise -> assert false
       | Sin e ->
          let signal = Signal.of_expr e in
          let (freq, phase) = Signal.linearize signal in
@@ -53,6 +59,9 @@ module SuperCollider = struct
              go phase;
              ")"
            ]
+      | Triangle _ -> assert false
+      | Saw _ -> assert false
+      | Square _ -> assert false
       | Sum es ->
         es
         |> List.map go
