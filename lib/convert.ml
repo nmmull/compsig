@@ -68,5 +68,6 @@ module SuperCollider = struct
     in go
 
   let of_signal s =
+
     "s.waitForBoot({{" ^ of_expr (Signal.to_expr s) ^ "}.play;});"
 end

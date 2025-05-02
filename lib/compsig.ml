@@ -4,6 +4,7 @@ module Polynomial = Polynomial
 module Signal = Signal
 module Convert = Convert
 module Lambda_sc = Lambda_sc
+module Supercollider = Supercollider
 
 let ver_num = "0.1"
 

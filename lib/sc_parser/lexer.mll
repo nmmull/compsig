@@ -3,26 +3,25 @@ open Parser
 }
 
 let whitespace = [' ' '\t' '\n' '\r']+
-let float = '-'? ['0'-'9']+ '.' ['0'-'9']*
-let var = ['a'-'z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '\'']*
+let float = '-'? ['0'-'9']+ '.' ['0'-'9']+
+let ident = ['a'-'z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '\'']*
 
 rule read =
   parse
-  | "signal" { SIGNAL }
-  | ":" { COLON }
-  | "fun" { FUN }
-  | "->" { ARROW }
-  | "let" { LET }
+  | "var" { VAR }
   | "=" { EQUALS }
-  | "in" { IN }
-  | "(" { LPAREN }
-  | ")" { RPAREN }
+  | ";" { SEMIC }
+  | "," { COMMA }
+  | "." { DOT }
+  | "SinOsc" { SINOSC }
+  | "ar" { AR }
+  | "kr" { KR }
+  | ":" { COLON }
   | "+" { PLUS }
   | "*" { TIMES }
-  | "<<" { COMP }
-  | "sin" { SIN }
-  | "t" { T }
+  | "(" { LPAREN }
+  | ")" { RPAREN }
   | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
-  | var { VAR (Lexing.lexeme lexbuf) }
+  | ident { IDENT (Lexing.lexeme lexbuf) }
   | whitespace { read lexbuf }
   | eof { EOF }

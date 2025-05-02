@@ -6,12 +6,7 @@ type expr =
   | Var of ident
   | Float of float
   | Bop of bop * expr * expr
-  | SinOsc of {
-      freq: expr;
-      phase: expr;
-      mul: expr;
-      add: expr;
-    }
+  | SinOsc of (string * expr) list
   | Block of prog * expr
 
 and stmt =

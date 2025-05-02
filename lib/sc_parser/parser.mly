@@ -3,23 +3,23 @@ open Syntax
 
 let split_last =
   let rec go acc = function
-  | [] -> None
-  | [x] -> Some (List.rev acc, x)
-  | x :: l -> go (x :: acc) l
+    | [] -> None
+    | [x] -> Some (List.rev acc, x)
+    | x :: l -> go (x :: acc) l
+  in go []
 %}
 
 %token VAR "var"
+%token <float> FLOAT
 %token <string> IDENT
-%token <string> LABEL
 %token EQUALS "="
 %token SEMIC ";"
+%token COMMA ","
 %token DOT "."
 
 %token SINOSC "SinOsc"
-%token FREQ "freq"
-%token PHASE "phase"
-%token MUL "mul"
-%token ADD "add"
+%token AR "ar"
+%token KR "kr"
 
 %token COLON ":"
 
@@ -46,38 +46,37 @@ prog:
     }
 
 stmt:
-  | "var"? x=ident "=" e=expr { Assign (x, e) }
+  | x=IDENT "=" e=expr { Assign (x, e) }
+  | "var" x=IDENT "=" e=expr { Assign (x, e) }
   | e=expr { Expr e }
 
-semi_stmt:
-  | ";" s=stmt { s }
-
+/* https://discuss.ocaml.org/t/solving-shift-reduce-conflicts-for-optional-trailing-comma-in-menhir/15042 */
 stmts:
-  | s=stmt ss=semi_stmt* ?";" { s :: ss }
+  | s=stmt { [s] }
+  | s=stmt ";" { [s] }
+  | s=stmt ";" ss=separated_nonempty_list(SEMIC, stmt) { s :: ss }
 
 ar:
   | "ar" { () }
   | "kr" { () }
 
 arg_label:
-  | label=LABEL ":" { label }
+  | label=IDENT ":" { label }
 
 arg:
-  | label=arg_label? e=expr { (label, expr) }
-
-comma_arg:
-  | "," arg=arg { arg }
+  | label=arg_label expr=expr { (Some label, expr) }
+  | expr=expr { (None, expr) }
 
 args:
-  | a=arg, as=comma_args* ","? { a :: as }
+  | args=separated_list(COMMA, arg) { args }
 
 %inline bop:
   | "+" { Add }
   | "*" { Mul }
 
 expr:
-  | "SinOsc" "." ar "(" args ")" { assert false }
+  | "SinOsc" "." ar "(" args ")" { SinOsc [] }
   | e1=expr op=bop e2=expr { Bop(op, e1, e2) }
   | n=FLOAT { Float n }
-  | x=VAR { Var x }
+  | x=IDENT { Var x }
   | "(" e=expr ")" { e }
