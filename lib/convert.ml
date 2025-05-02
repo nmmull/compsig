@@ -42,54 +42,49 @@ end
 
 module SuperCollider = struct
   let of_expr =
+    let extract e =
+      let signal = Signal.of_expr e in
+      let (freq, phase) = Signal.linearize signal in
+      ( Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq)
+      , Signal.to_expr phase
+      )
+    in
     let rec go = function
       | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)" (* TODO: Abstract over duration *)
       | Const f -> string_of_float f ^ "0"
       | Noise -> "WhiteNoise.ar()"
       | Sin e ->
-         let signal = Signal.of_expr e in
-         let (freq, phase) = Signal.linearize signal in
-         let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
-         let phase = Signal.to_expr phase in
-         String.concat ""
-           [
-             "SinOsc.ar(freq: ";
-             go freq;
-             ", phase: ";
-             go phase;
-             ")"
-           ]
+        let freq, phase = extract e in
+        String.concat ""
+          [
+            "SinOsc.ar(freq: ";
+            go freq;
+            ", phase: ";
+            go phase;
+            ")"
+          ]
       | Triangle e ->
-         let signal = Signal.of_expr e in
-         let (freq, phase) = Signal.linearize signal in
-         let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
-         let phase = Signal.to_expr phase in
-         String.concat ""
-           [
-             "LFTri.ar(freq: ";
-             go freq;
-             ", iphase: ";
-             go phase;
-             ")"
-           ]
+        let freq, phase = extract e in
+        String.concat ""
+          [
+            "LFTri.ar(freq: ";
+            go freq;
+            ", iphase: ";
+            go phase;
+            ")"
+          ]
       | Saw e ->
-         let signal = Signal.of_expr e in
-         let (freq, phase) = Signal.linearize signal in
-         let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
-         let phase = Signal.to_expr phase in
-         String.concat ""
-           [
-             "LFSaw.ar(freq: ";
-             go freq;
-             ", iphase: ";
-             go phase;
-             ")"
-           ]
+        let freq, phase = extract e in
+        String.concat ""
+          [
+            "LFSaw.ar(freq: ";
+            go freq;
+            ", iphase: ";
+            go phase;
+            ")"
+          ]
       | Square e ->
-        let signal = Signal.of_expr e in
-        let (freq, phase) = Signal.linearize signal in
-        let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
-        let phase = Signal.to_expr phase in
+        let freq, phase = extract e in
         String.concat ""
           [
             "LFPulse.ar(freq: ";
