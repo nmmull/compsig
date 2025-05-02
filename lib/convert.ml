@@ -95,7 +95,7 @@ module SuperCollider = struct
           ]
       | Sum es ->
         es
-        |> List.map go
+        |> List.map (fun x -> "(" ^ go x ^ ")")
         |> List.filter ((<>) "0.0")
         |> (fun l -> if List.is_empty l then ["0.0"] else l)
         |> String.concat " + "
