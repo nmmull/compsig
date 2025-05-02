@@ -1,10 +1,31 @@
+module FSignal = struct
+  type t = [
+    | `Sin
+    | `Triangle
+    | `Saw
+    | `Square
+  ]
+
+  let to_string = function
+    | `Sin -> "sin"
+    | `Triangle -> "triangle"
+    | `Saw -> "saw"
+    | `Square -> "square"
+
+  let to_expr s e =
+    let open Syntax in
+    match s with
+    | `Sin -> Sin e
+    | `Triangle -> Triangle e
+    | `Saw -> Saw e
+    | `Square -> Square e
+end
+
+type fsignal = FSignal.t
 type 'a base_signal =
   | Ident
   | Noise
-  | Sin of 'a
-  | Triangle of 'a
-  | Saw of 'a
-  | Square of 'a
+  | FSignal of fsignal * 'a
 
 module rec P : Polynomial_intf.POLYNOMIAL
   with type coefficient = float
@@ -14,47 +35,31 @@ module rec P : Polynomial_intf.POLYNOMIAL
 and Base : Utils.BASE with type t = P.t base_signal = struct
   type t = P.t base_signal
 
-  let order_base_signal p =
-    match p with
-    | Ident -> -2
-    | Noise -> -1
-    | Sin _ -> 0
-    | Triangle _ -> 1
-    | Saw _ -> 2
-    | Square _ -> 3
-  
-  let extract_poly p =
-    match p with
-    | Ident -> assert false
-    | Noise -> assert false
-    | Sin x -> x
-    | Triangle x -> x
-    | Saw x -> x
-    | Square x -> x
-
   let compare b1 b2 =
     match b1, b2 with
-    | Ident, Ident -> 0
-    | Noise, Noise -> 0
+    | Ident, Ident | Noise, Noise -> 0
     | Ident, _ -> -1
     | _, Ident -> 1
-    | p1, p2 -> 
-      let x1 = order_base_signal p1 in
-      let x2 = order_base_signal p2 in
-      if x1 < x2 then
-        1
-      else if x1 > x2 then
-        -1
-      else
-        P.compare (extract_poly p1) (extract_poly p2)
+    | Noise, _ -> -1
+    | _, Noise -> 1
+    | FSignal (k1, p1), FSignal (k2, p2) ->
+      if k1 < k2
+      then -1
+      else if k1 = k2
+      then P.compare p1 p2
+      else 1
 
   let to_string = function
     | Ident -> "t"
     | Noise -> "noise()"
-    | Sin signal -> "sin(" ^ Fmt.to_to_string P.pp signal ^ ")"
-    | Triangle signal -> "triangle(" ^ Fmt.to_to_string P.pp signal ^ ")"
-    | Saw signal -> "saw(" ^ Fmt.to_to_string P.pp signal ^ ")"
-    | Square signal -> "square(" ^ Fmt.to_to_string P.pp signal ^ ")"
+    | FSignal (s, signal) ->
+      String.concat ""
+        [
+          FSignal.to_string s;
+          "(";
+          Fmt.to_to_string P.pp signal;
+          ")";
+        ]
 
   let pp = Fmt.of_to_string to_string
 end
@@ -64,20 +69,17 @@ module M = Monomial.Make(Base)
 
 let ident = P.of_base Ident
 let noise = P.of_base Noise
-let sin signal = P.of_base (Sin signal)
-let triangle signal = P.of_base (Triangle signal)
-let saw signal = P.of_base (Saw signal)
-let square signal = P.of_base (Square signal)
+let sin signal = P.of_base (FSignal (`Sin, signal))
+let triangle signal = P.of_base (FSignal (`Triangle, signal))
+let saw signal = P.of_base (FSignal (`Saw, signal))
+let square signal = P.of_base (FSignal (`Square, signal))
 let const = P.of_coefficient
 
 let rec comp_base base signal =
   match base with
   | Ident -> signal
   | Noise -> P.of_base Noise
-  | Sin p1 -> P.of_base (Sin (P.comp comp_base p1 signal))
-  | Triangle p1 -> P.of_base (Triangle (P.comp comp_base p1 signal))
-  | Saw p1 -> P.of_base (Saw (P.comp comp_base p1 signal))
-  | Square p1 -> P.of_base (Square (P.comp comp_base p1 signal))
+  | FSignal (s, p) -> P.of_base (FSignal (s, P.comp comp_base p signal))
 
 let comp = P.comp comp_base
 
@@ -140,7 +142,4 @@ and monomial_to_expr mono =
 and base_signal_to_expr = function
   | Ident -> Syntax.Ident
   | Noise -> Syntax.Noise
-  | Sin s -> Syntax.Sin (to_expr s)
-  | Triangle s -> Syntax.Triangle (to_expr s)
-  | Saw s -> Syntax.Saw (to_expr s)
-  | Square s -> Syntax.Square (to_expr s)
+  | FSignal (s, e) -> FSignal.to_expr s (to_expr e)

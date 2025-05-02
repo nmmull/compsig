@@ -1,13 +1,11 @@
 open Syntax
 
 module type Intf = sig
+  type fsignal
   type 'a base_signal =
     | Ident
     | Noise
-    | Sin of 'a
-    | Triangle of 'a
-    | Saw of 'a
-    | Square of 'a
+    | FSignal of fsignal * 'a
   type t
   include Utils.COMPARE with type t := t
   include Utils.PP with type t := t
