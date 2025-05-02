@@ -1,0 +1,5 @@
+let pi = 3.14159265358979312 in
+let sin_osc = fun freq -> sin << (2. * pi * freq * t) in
+let tri_osc = fun freq -> triangle << (2. * pi * freq * t) in
+let sqr_osc = fun freq -> square << (2. * pi * freq * t) in
+0.5 * (sin_osc (440.) + (5. * sin_osc 5.))
