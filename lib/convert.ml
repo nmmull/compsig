@@ -45,11 +45,7 @@ module SuperCollider = struct
     let rec go = function
       | Ident -> "Line.ar(start: 0.0, end: 10.0, dur: 10.0)" (* TODO: Abstract over duration *)
       | Const f -> string_of_float f ^ "0"
-      | Noise -> 
-         String.concat ""
-           [
-             "WhiteNoise.ar()"
-           ]
+      | Noise -> "WhiteNoise.ar()"
       | Sin e ->
          let signal = Signal.of_expr e in
          let (freq, phase) = Signal.linearize signal in
@@ -63,7 +59,7 @@ module SuperCollider = struct
              go phase;
              ")"
            ]
-      | Triangle e -> 
+      | Triangle e ->
          let signal = Signal.of_expr e in
          let (freq, phase) = Signal.linearize signal in
          let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
@@ -76,7 +72,7 @@ module SuperCollider = struct
              go phase;
              ")"
            ]
-      | Saw e -> 
+      | Saw e ->
          let signal = Signal.of_expr e in
          let (freq, phase) = Signal.linearize signal in
          let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
@@ -89,7 +85,7 @@ module SuperCollider = struct
              go phase;
              ")"
            ]
-      | Square e -> 
+      | Square e ->
         let signal = Signal.of_expr e in
         let (freq, phase) = Signal.linearize signal in
         let freq = Signal.to_expr Signal.(mul (const (1. /. 2. /. Float.pi)) freq) in
