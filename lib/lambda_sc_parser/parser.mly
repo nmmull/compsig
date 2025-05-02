@@ -5,6 +5,10 @@ open Syntax
 %token <float> FLOAT
 %token <string> VAR
 %token SIN "sin"
+%token NOISE "noise"
+%token TRIANGLE "triangle"
+%token SAW "saw"
+%token SQUARE "square"
 %token PLUS "+"
 %token TIMES "*"
 %token COMP "<<"
@@ -60,6 +64,10 @@ expr1:
 expr2:
   | n=FLOAT { Float n }
   | "sin" { Sin }
+  | "noise" { Noise }
+  | "triangle" { Triangle }
+  | "saw" { Saw }
+  | "square" { Square }
   | "t" { Ident }
   | x=VAR { Var x }
   | "(" e=expr ")" { e }

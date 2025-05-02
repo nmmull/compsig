@@ -21,6 +21,10 @@ rule read =
   | "*" { TIMES }
   | "<<" { COMP }
   | "sin" { SIN }
+  | "noise" { NOISE }
+  | "triangle" { TRIANGLE }
+  | "saw" { SAW }
+  | "square" { SQUARE }
   | "t" { T }
   | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
   | var { VAR (Lexing.lexeme lexbuf) }

@@ -16,9 +16,8 @@ exception UnexpectedError
 
 let rec type_of ctxt =
   let rec go = function
-    | Float _ -> Some SignalTy
-    | Ident -> Some SignalTy
-    | Sin -> Some SignalTy
+    | Float _ | Ident
+    | Sin | Noise | Triangle | Saw | Square -> Some SignalTy
     | Bop (_, e1, e2) -> (
        match go e1, go e2 with
        | Some SignalTy, Some SignalTy -> Some SignalTy
@@ -47,6 +46,10 @@ let rec eval env =
     | Float f -> VSignal (const f)
     | Ident -> VSignal ident
     | Sin -> VSignal (sin ident)
+    | Noise -> VSignal noise
+    | Triangle -> VSignal (triangle ident)
+    | Saw -> VSignal (saw ident)
+    | Square -> VSignal (square ident)
     | Bop (bop, e1, e2) -> (
        match go e1, go e2 with
        | VSignal s1, VSignal s2 -> (
