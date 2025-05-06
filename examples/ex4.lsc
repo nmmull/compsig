@@ -1,0 +1,10 @@
+let pi = 3.14159265358979312 in
+let sin_osc = fun freq phase -> sin << (2. * pi * freq * t + phase) in
+let s1 = sin_osc (sin_osc 0.11 0.) 0. in
+let s2 = 95. * sin_osc 0.01 0. + 1. in
+let s3 = 60. * sin_osc 0.005 0. in
+let s4 = s3 * sin_osc s2 0. + 100. in
+let s5 = sin_osc 98. 0. + sin_osc 97. 0. in
+let s6 = pi + sin_osc 0.0005 0. in
+let s7 = s6 * sin_osc s4 s5 in
+sin_osc s1 s7
