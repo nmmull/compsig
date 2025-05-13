@@ -195,14 +195,14 @@ $ sclang out.scd
 If we want to *see* this piece, we can translate it into a python script and pipe it into `python3`
 
 ```
-$ dune exec compsig -- -i lsc -i py < examples/ex4.ml | python3
+$ dune exec compsig -- -i lsc -o py < examples/ex4.ml | python3
 ```
 
 Note that the output script depends on Matplotlib and
 [SciPy](https://scipy.org/). If successful, you should see a plot like
 this one.
 
-TODO
+![image](example/ex4.png)
 
 ## Future Work
 
