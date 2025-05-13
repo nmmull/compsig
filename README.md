@@ -1,6 +1,6 @@
 # Compsig
 
-`compsig` is a tool for converting signal between different audio
+`compsig` is a tool for converting signals between different audio
 programming languages.  This repository contains an experiment/proof
 of concept/demonstration of such a tool (read: it's incredibly
 rough).
@@ -24,13 +24,13 @@ Mull](https://nmmull.github.io) as a part of a
 
 Currently, the only way to use `compsig` is to build it from source.
 You can clone this repository and build an executable using `dune
-build`, or you can use `dune exec`, e.g., use
+build`, or you can use `dune exec`, e.g.,
 
 ```
 $ dune exec compsig -- --help
 ```
 
-to see more details about using `compsig`.
+opens a `man` page for `compsig`.
 
 ## Pitch
 
@@ -58,49 +58,47 @@ A very simple example:
 [`msynth`](https://github.com/smimram/monadic-synth) a (frankly, quite
 beautiful) OCaml library for building synthesizers
 [*monadically*](https://en.wikipedia.org/wiki/Monad_(functional_programming))
-does not support by default sine oscillators with a *phase shift*
+doesn't support by default sine oscillators with a *phase shift*
 parameter. Sine oscillators in
 [SuperCollider](https://supercollider.github.io/) have a phase
-parameter, and it is often used to create singals with complex
-structure (and a very interesting timbre).  To be clear, it's not
-*impossible* create a sine oscillator in `msynth` which takes a phase
-parameter, but doing so requires having a deeper understanding of how
-the library works.
+parameter, and this feature is used to create singals with surprising
+structure and timbre (e.g., see the example below).  To be clear, it's
+not *impossible* to create a sine oscillator in `msynth` which takes a
+phase parameter, but doing so requires having a deeper understanding
+of how the library works.
 
-Despite all this, audio PLs are often built on the same fundamental
-principles, e.g., time and signals.  And signals processing is a
-well-established field with strong theoretical foundations.  Our goal
-is to take greater advantage of this theory, to provide an
+Despite all this, audio PLs are built on the same fundamental
+principles, e.g., time and signals.  And signals processing in general
+is a well-established field with strong theoretical foundations.  Our
+goal is to take greater advantage of this theory, to provide an
 *intermediate abstract representation of signals* that can be used as
 a kind of universal language to translate synthesizers implementions
 both to and from existing audio PLs.
 
-It is our belief that [algebraic signal
+We believe that [algebraic signal
 processing](https://ieeexplore.ieee.org/document/4520147) can form the
-basis of such a conversion tool. The rough idea: signals can be
-represented abstractly as element of a ring (this basically means
+basis of a conversion tool like `compsig`. The rough idea: signals can
+be represented abstractly as element of a ring (this basically means
 signals can be pointwise added and multiplied together). This picture
 can be extended by introduces an algebra of filters which acts on the
-ring of signals (we have not implemented filters). Another way of
-viewing this is as working in the free monadic structure which can be
-derived from `msynth`.
+ring of signals (note: we have not implemented filters). Another way
+of viewing this is as working in a free monadic structure which can be
+derived from something like `msynth`.
 
-The idea is simple on the surface:
+So the idea of `compsig` is simple in theory:
 
-* Implement an interface for an abstract algebraic representation of signals. In this basic experiment we choose to represent signals as polynomials of single-argument uninterpreted functions, one for each signal kind (side note: this is a very nice example of recursive modules since the uninterpreted functions representing signals can have these polynomials of uninterpreted functions as arguments). This can be seen in the definition of `Signal.t`.
-* For any given audio PL, implement a converter from the language to this algebraic representation, as well as a converter from the algebraic representation to the language.
+* We implement an interface for an abstract algebraic representation of signals. In this basic experiment we choose to represent signals as polynomials of single-argument uninterpreted functions, one for each signal kind (side note: this is a very nice example of recursive modules since the uninterpreted functions representing signals can have these polynomials of uninterpreted functions as arguments). This can be seen in the definition of `Signal.t`.
+* For any audio PL, we can implement a converter from the language to this algebraic representation, as well as a converter from the algebraic representation to the language. To convert between any two audio PLs, we can convert from the first
+language to the signal algebra, and then from the signal algebra to
+the second language.
 
-To convert between any two audio PLs, convert from the first language
-to the signal algebra, and then from the signal algebra to the second
-language.
-
-This ideas has other nice features, e.g., we don't *need* to convert
-between audio PLs, but can instead translate an abstract signal into
-something which can be visualized by a visualization tool (e.g.,
+This idea has other surprisingly nice features. We don't *need* to
+convert between audio PLs, but can instead translate an abstract
+signal into something which can be visualized, e.g., using
 [Matplotlib](https://matplotlib.org/)). This allows us to better *see*
-the signal (we, for example, have found Matplotlib to be better at
-visualizing signals than SuperColliders built-in plotting tool).  It
-is also worth noting that this abstract representation means that we
+the signal we design (note: we've found Matplotlib to be better for
+visualizing signals than SuperColliders built-in plotting tool).  It's
+also worth noting that this abstract representation means that we
 don't need to worry about the low-level details of audio synthesis
 until we've translated to a target language.
 
@@ -111,13 +109,15 @@ from an engineering perspective (and least interesting from a
 theoretical perspective) is building parsers for existing
 fully featured audio PLs. This can be done most effectively by
 depending on general parsing frameworks like
-[treesitter](https://tree-sitter.github.io/tree-sitter/). We have
+[treesitter](https://tree-sitter.github.io/tree-sitter/). We've
 chosen to ignore this problem for now and focus on
 
 * the algebraic representation of signals
 * the translation of this representation *into* existing audio PLs
 
-To this end, we introduce a toy language we call *LambdaSC* (short for
+## LambdaSC
+
+To this end, we introduce a toy language we call *lambdaSC* (short for
 lambda-SuperCollider) which is gives us a way of writing abstract
 signals more conveniently. The most important feature of this language
 is that it takes *signal composition* as a primitive operation.  The
@@ -131,10 +131,7 @@ number of primitives we need. The second reason is that we wanted our
 source language, despite not being fully featured, to have operations
 not necessarily supported by our target languages.
 
-### LambdaSC
-
-LambdaSC is a toy language for implementing signals with composition
-as a primitive operator. It has the following grammar:
+LambdaSC has the following grammar:
 
 ```
 <op>  ::= + | * | <<
@@ -148,7 +145,8 @@ as a primitive operator. It has the following grammar:
         | <v> | <sig>
 ```
 
-For example, this is the program in `example/ex1.lsc`:
+This, for example, is a simple lambdaSC program (which appears in
+`example/ex1.lsc`).
 
 ```ocaml
 let pi = 3.14159265358979312 in
@@ -160,18 +158,18 @@ let s2 = sin_osc 1. 0. in
 s2 * s1
 ```
 
-In particular, note that there is no built-in function for
-constructing a sine wave of a given frequency and phase.  This
-function can be implemented by composing `sin` with a linear function
-of `t`, the identity (time) signal.
+Note that there is no built-in function for constructing a sine wave
+of a given frequency and phase.  This function can be implemented by
+composing `sin` with a linear function of `t`, the identity (time)
+signal.
 
-LambdaSC programs are evaluated to `Signal.t` values (described
-above).
+LambdaSC programs are intepreted as `Signal.t` values, as described
+above.
 
 ## Example
 
 Consider this more complicated example, which is a translation of
-tweet0045 by [Fredrik Olofsson](https://fredrikolofsson.com/) written in `examples/ex4.ml`.
+tweet0045 by [Fredrik Olofsson](https://fredrikolofsson.com/) (and appears in `examples/ex4.ml`).
 
 ```ocaml
 let pi = 3.14159265358979312 in
@@ -200,17 +198,19 @@ If we want to *see* this piece, we can translate it into a python script and pip
 $ dune exec compsig -- -i lsc -i py < examples/ex4.ml | python3
 ```
 
-This depends on Matplotlib and [SciPy](https://scipy.org/). If successful, you should see a plot like this one (this one is zoomed in a bit).
+Note that the output script depends on Matplotlib and
+[SciPy](https://scipy.org/). If successful, you should see a plot like
+this one.
 
 TODO
 
 ## Future Work
 
 There is still quite a bit to do on this project. Of course, we'd like
-to make this fully featured. But before doing this, we have a couple
+to make this usable tool, but before doing this, we have a couple
 things left to experiment with:
 
 * implementing filters
-* attempting less destructive translations, i.e., maintaining more of the original structure of the program if possible
-* dealing with the "time" component, which is more important to music composition in general
+* attempting less destructive translations, i.e., maintaining more of the original structure of the program when possible
+* dealing with the "time" component of audio PLs, which is more important to music composition in general
 * looking more deeply into other audio PLs
