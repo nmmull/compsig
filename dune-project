@@ -1,25 +1,17 @@
 (lang dune 3.17)
-(cram enable)
-(name compsig)
-(generate_opam_files true)
 
-(source (github nmmull/compsig))
+(name compsig)
+
+(generate_opam_files true)
 
 (authors
  "Nathan Mull <nmmull@bu.edu>"
  "William Chen")
 
-(maintainers
- "Nathan Mull <nmmull@bu.edu>"
- "William Chen")
-
-(license TODO)
-(documentation TODO)
+(maintainers "Nathan Mull <nmmull@bu.edu>")
 
 (package
  (name compsig)
- (synopsis "TODO")
- (description "TODO")
  (depends
    ocaml
    alcotest
@@ -27,7 +19,9 @@
    cmdliner)
  (tags
   ("algebraic signal processing"
-   supercollider
+   "supercollider"
    "computer music")))
 
 (using menhir 3.0)
+
+(cram enable)
