@@ -1,14 +1,12 @@
 # Compsig
 
 `compsig` is a tool for converting signal between different audio
-programming languages (e.g.,
-[supercollider](https://supercollider.github.io)).  This repository
-contains an experiment/proof of concept towards such a tool (read:
-it's incredibly rough).
+programming languages.  This repository contains an experiment/proof
+of concept towards such a tool (read: it's incredibly rough).
 
-We envisage `compsig` as a *[pandoc](https://pandoc.org) for signals*,
-though in reality, it's inspired more by logical frameworks like
-[Dedukti](https://deducteam.github.io).  In practical terms: we would
+We envisage `compsig` as a *[pandoc](https://pandoc.org) for signals*
+(in reality, it's inspired more by logical frameworks like
+[Dedukti](https://deducteam.github.io)).  In practical terms: we would
 like to be able to port implementations of sythesizers across
 different audio programming languages to expand the accessibility of
 these tools for musicians and programmers.  In broader terms: we would
@@ -25,41 +23,40 @@ Mull](https://nmmull.github.io) as a part of a
 
 Currently, the only way to use `compsig` is to build it from source.
 You can clone this repository and build an executable using `dune
-build`.  You can run:
+build`, or you can use `dune exec`, e.g., use
 
 ```
 dune exec compsig -- --help
 ```
 
-to see more details about using the tool.  Also take a look at the
-example below.
+to see more details about using `compsig`.
 
 ## Pitch
 
 There are [quite a few programming languages for music composition and
 audio
 synthesis](https://en.wikipedia.org/wiki/List_of_audio_programming_languages),
-and their differences are not always superficial; some may be intended
-for live performance, others better suited for noise music, others
-for pedagogical use.
+and their differences aren't necessarily superficial; some are
+intended for live performance, others better suited for noise music,
+others for pedagogical use.
 
 This is not terribly surprising; both music composition and
 programming language design are creative endeavors.  Audio PL
-designers are not only determining what PL paradigms to implement, but
-also what inferface they want to expose to the composer/programmer (we
-never want to stifle musical creativity by making the means of
-composition too restrictive).
+designers not only have to determine what PL paradigms they want in
+their language, but also what inferface they want to expose to the
+composer/programmer (we never want to stifle musical creativity by
+making the means of composition too restrictive).
 
 This poses a challenge to newcomers: learning a audio PL isn't just
 learning new syntax; it may be learning a new framework for
 composition.  And although these frameworks can be very similar, even
 small differences in what kinds of operations are supported can be
-sticking points in the learning process
+sticking points in the learning process.
 
 A very simple example:
 [`msynth`](https://github.com/smimram/monadic-synth) a (frankly, quite
 beautiful) OCaml library for building synthesizers
-[*monadically*](https://en.wikipedia.org/wiki/Monad_(functional_programming)
+[*monadically*](https://en.wikipedia.org/wiki/Monad_(functional_programming))
 does not support by default the ability to parameterize sine
 oscillators by a *phase shift*, a feature which is commonly used in
 SuperCollider.  To be clear, it's not *impossible* create a sine
