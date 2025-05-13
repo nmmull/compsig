@@ -202,7 +202,7 @@ Note that the output script depends on Matplotlib and
 [SciPy](https://scipy.org/). If successful, you should see a plot like
 this one.
 
-![image](example/ex4.png)
+![signal image](examples/ex4.png)
 
 ## Future Work
 
