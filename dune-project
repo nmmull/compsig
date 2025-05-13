@@ -13,9 +13,10 @@
  (name compsig)
  (depends
    ocaml
+   dune
    alcotest
-   fmt
-   cmdliner)
+   cmdliner
+   menhir)
  (tags
   ("algebraic signal processing"
    "supercollider"
