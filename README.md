@@ -38,7 +38,7 @@ There are [quite a few programming languages for music composition and
 audio
 synthesis](https://en.wikipedia.org/wiki/List_of_audio_programming_languages),
 and their differences aren't necessarily superficial; some are
-intended for live performance, others better suited for noise music,
+intended for live performance, others better suited for fixed media,
 others for pedagogical use.
 
 This is not terribly surprising; both music composition and
@@ -48,7 +48,7 @@ their language, but also what inferface they want to expose to the
 composer/programmer (we never want to stifle musical creativity by
 making the means of composition too restrictive).
 
-This poses a challenge to newcomers: learning a audio PL isn't just
+This poses a challenge to newcomers: learning an audio PL isn't just
 learning new syntax; it may be learning a new framework for
 composition.  And although these frameworks can be very similar, even
 small differences in what kinds of operations are supported can be
@@ -58,36 +58,36 @@ A very simple example:
 [`msynth`](https://github.com/smimram/monadic-synth) a (frankly, quite
 beautiful) OCaml library for building synthesizers
 [*monadically*](https://en.wikipedia.org/wiki/Monad_(functional_programming))
-doesn't support by default sine oscillators with a *phase shift*
-parameter. Sine oscillators in
+doesn't support sine oscillators with a *phase shift*
+parameter by default. Sine oscillators in
 [SuperCollider](https://supercollider.github.io/) have a phase
-parameter, and this feature is used to create singals with surprising
+parameter, and this feature is used to create singals with differing
 structure and timbre (e.g., see the example below).  To be clear, it's
 not *impossible* to create a sine oscillator in `msynth` which takes a
 phase parameter, but doing so requires having a deeper understanding
 of how the library works.
 
 Despite all this, audio PLs are built on the same fundamental
-principles, e.g., time and signals.  And signals processing in general
+principles, e.g., time and signals. Additionally, signal processing in general
 is a well-established field with strong theoretical foundations.  Our
 goal is to take greater advantage of this theory, to provide an
 *intermediate abstract representation of signals* that can be used as
-a kind of universal language to translate synthesizers implementions
+a kind of universal language to translate synthesizers' implementions
 both to and from existing audio PLs.
 
 We believe that [algebraic signal
 processing](https://ieeexplore.ieee.org/document/4520147) can form the
 basis of a conversion tool like `compsig`. The rough idea: signals can
-be represented abstractly as element of a ring (this basically means
+be represented abstractly as an element of a ring (this basically means
 signals can be pointwise added and multiplied together). This picture
-can be extended by introduces an algebra of filters which acts on the
+can be extended by introducing an algebra of filters which acts on the
 ring of signals (note: we have not implemented filters). Another way
 of viewing this is as working in a free monadic structure which can be
 derived from something like `msynth`.
 
 So the idea of `compsig` is simple in theory:
 
-* We implement an interface for an abstract algebraic representation of signals. In this basic experiment we choose to represent signals as polynomials of single-argument uninterpreted functions, one for each signal kind (side note: this is a very nice example of recursive modules since the uninterpreted functions representing signals can have these polynomials of uninterpreted functions as arguments). This can be seen in the definition of `Signal.t`.
+* We implement an interface for an abstract algebraic representation of signals. In this basic experiment we choose to represent signals as polynomials of single-argument uninterpreted functions, one for each kind of signal (side note: this is a very nice example of recursive modules since the uninterpreted functions representing signals can have these polynomials of uninterpreted functions as arguments). This can be seen in the definition of `Signal.t`.
 * For any audio PL, we can implement a converter from the language to this algebraic representation, as well as a converter from the algebraic representation to the language. To convert between any two audio PLs, we can convert from the first
 language to the signal algebra, and then from the signal algebra to
 the second language.
@@ -96,8 +96,8 @@ This idea has other surprisingly nice features. We don't *need* to
 convert between audio PLs, but can instead translate an abstract
 signal into something which can be visualized, e.g., using
 [Matplotlib](https://matplotlib.org/)). This allows us to better *see*
-the signal we design (note: we've found Matplotlib to be better for
-visualizing signals than SuperColliders built-in plotting tool).  It's
+the signal we design (note: we've found Matplotlib to be more convenient for
+visualizing signals than SuperCollider's built-in plotting tool).  It's
 also worth noting that this abstract representation means that we
 don't need to worry about the low-level details of audio synthesis
 until we've translated to a target language.
@@ -105,7 +105,7 @@ until we've translated to a target language.
 ## Methodology
 
 The idea is not as simple in practice.  The most challenging problem
-from an engineering perspective (and least interesting from a
+from an engineering perspective (and less interesting from a
 theoretical perspective) is building parsers for existing
 fully featured audio PLs. This can be done most effectively by
 depending on general parsing frameworks like
@@ -121,7 +121,7 @@ To this end, we introduce a toy language we call *lambdaSC* (short for
 lambda-SuperCollider) which is gives us a way of writing abstract
 signals more conveniently. The most important feature of this language
 is that it takes *signal composition* as a primitive operation.  The
-reason for this is two fold. First, we believe that signal composition
+reason for this is twofold. First, we believe that signal composition
 is a missing primitive in languages like SuperCollider.  It can be
 effectively done in `msynth` using the monadic bind operator (`>>=`),
 but even in this setting, it may not be immediately clear to newcomers
@@ -210,7 +210,7 @@ There is still quite a bit to do on this project. Of course, we'd like
 to make this usable tool, but before doing this, we have a couple
 things left to experiment with:
 
-* implementing filters
-* attempting less destructive translations, i.e., maintaining more of the original structure of the program when possible
-* dealing with the "time" component of audio PLs, which is more important to music composition in general
-* looking more deeply into other audio PLs
+* Implementing filters
+* Attempting less destructive translations, i.e., maintaining more of the original structure of the program when possible
+* Dealing with the "time" component of audio PLs, which is more important to music composition in general
+* Looking more deeply into other audio PLs
